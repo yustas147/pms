@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+        <record model='ir.actions.act_window' id='product_proxy_act'>
+            <field name="name">Product proxy</field>
+            <field name="res_model">product.proxy</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record> 
+        <record model='ir.actions.act_window' id='virtual_tire_act'>
+            <field name="name">Virtual tire</field>
+            <field name="res_model">virt.tire</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record> 
+        
+
+        <menuitem name="Price merge system" id="menu_root"/>
+            <menuitem name="Technical1" parent="menu_root" id="technical1_id" sequence="10"/>
+                 <menuitem action="product_proxy_act" parent="technical1_id" id="product_proxy_menu" sequence="10" />
+            <menuitem name="Virtual goods" parent="menu_root" id="vg_id" sequence="20"/>
+                 <menuitem action="virtual_tire_act" parent="vg_id" id="virtual_tire_menu" sequence="10" />
+    </data>
+
+
+</openerp>

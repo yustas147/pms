@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+        <record id="product_etalone_add_inh" model="ir.ui.view">
+            <field name="name">product.normal.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view" />
+<!--            <field name="type">form</field>
+-->
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+            <xpath expr="//form/sheet" position="before" version="7.0">
+            <head>
+            	<field name="isConnEt" widget="statusbar" />
+            </head>
+            </xpath>
+             <xpath expr="/form/sheet/notebook/page[@string='Information']" position="inside" version="7.0">
+                            <group attrs="{'invisible':[('supplier','!=',1)]}">
+                                <separator string="Suppliers" />
+                                <newline/>
+                                <field name="seller_ids"  nolabel="1" height="150" />
+                            </group>
+             </xpath>
+
+                <xpath expr="/form/sheet/notebook/page[@string='Information']" position="inside">
+                      <separator string="Etalon information" colspan="4"/>
+                      <newline/>
+                          <group attrs="{'invisible':[('supplier','!=',1)]}" col="8">
+                               <label string="Tthis product is etalon" colspan="2" />
+                               <button name="set_list_price" string="set_list_price" colspan="1" type="object" icon="gtk-ok"/>
+                               <button name="set_all_lp" string="set_all_lp" colspan="1" type="object" icon="gtk-ok"/>
+                               <button name="connect_bkg" string="connect_bkg" colspan="1" type="object" icon="gtk-ok"/>
+                          </group>
+              <!--             <group  colspan="4" col="8" attrs="{'invisible':[('id','in', tyre_etalonic)]}"> -->
+                          <group  colspan="4" col="8" attrs="{'invisible':[('supplier','=',1)]}">
+                               <field name="etalon_product" colspan="6" domain="[('supplier','=',1)]"/>
+                               <newline/>
+                     <!--                on_change="onchange_etalon_product(etalon_product,categ_id)"
+                                     domain="[('categ_id','=',0)]"/>    -->
+                               <button name="connect" string="Connect" colspan="2" type="object" icon="gtk-ok"/>
+                               <button name="disconnect" string="Disconnect" colspan="2" type="object" icon="gtk-ok"/>
+                               <field name="connected" colspan="2" class="oe_right"/>
+                          </group>
+                </xpath>
+                <field name="name" position="after">
+                    <field name="supplier"/>
+                </field> 
+                <field name="standard_price" position="replace">
+                   <newline/>
+                </field>
+                <field name="list_price" position="after">
+                    <newline/>
+                	<field name="standard_price"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="product_etalone_add_inh_tree" model="ir.ui.view">
+            <field name="name">product.product.tree</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view" />
+            <field name="type">tree</field>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="/tree/field[@name='standard_price']" position="after">
+                    <field name="imp_qty"/>
+                    <field name="connected"/>
+
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="product_tyre_search_inh" model="ir.ui.view">
+            <field name="name">product.tyre.search.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_search_form_view" />
+            <field name="type">form</field>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <xpath expr="/search/field[@name='name']" position="before">
+                    <filter string="Unconnected" icon="terp-check" domain="[('connected', '=', 0)]"/>
+                    <separator orientation="vertical"/>
+                    <field name="supplier" widget="selection" />
+				</xpath>
+            </field>
+        </record>
+ <record id="product_tyre_supplinfo_inh" model="ir.ui.view">
+            <field name="name">product.tyre.suppl.tree</field>
+            <field name="model">product.supplierinfo</field>
+            <field name="inherit_id" ref="product.product_supplierinfo_tree_view" />
+            <field name="type">tree</field>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <field name="name" position="after">
+                <field name="plist_qty"/> 
+                <field name="plist_price"/> 
+                </field> 
+                <field name="sequence" position="replace"/>
+                <field name="delay" position="replace"/>
+                <field name="min_qty" position="replace"/>
+
+            </field>
+        </record>
+
+
+
+
+
+
+	</data>
+
+<!--
+	<data noupdate="1">
+		<record id="product_category_etalon" model="product.category">
+            <field name="name">Etalon product</field>
+        </record>
+    </data>
+-->
+
+</openerp>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record model="ir.ui.view" id="view_imp_config_form">
+                <field name="name">imp.config.form</field>
+        <field name="model">imp.config</field>
+        <field name="type">form</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+                        <form string="Imp config data xml">
+                 <group colspan="4" col="4" >
+                    <field name="name" colspan="2"/>
+<!--                     <field name="name" readonly="1" colspan="2"/> -->
+                    <newline/>
+                    <button name="get_prod_fields" string="Update product fields" colspan="2" type="object" icon="gtk-ok" />
+                    <button name="set_imp_prod_fields" string="Set imp fields" colspan="2" type="object" icon="gtk-ok" />
+
+                 </group>
+                 <newline/>
+                 <group col="24">
+</group>
+</form>
+</field>
+</record>
+
+
+    <record model="ir.ui.view" id="view_imp_config_tree">
+ 		<field name="name">imp.config.tree</field>
+    	<field name="model">imp.config</field>
+    	<field name="type">tree</field>
+    	<field name="priority" eval="10"/>
+        <field name="arch" type="xml">
+			<tree string="imp config data xml tree">
+        	  		<field name="name" />
+			</tree>
+        </field>
+	</record>
+
+  	<record model="ir.actions.act_window" id="action_imp_config">
+    	<field name="name">Import config</field>
+    	<field name="type">ir.actions.act_window</field>
+    	<field name="domain">[]</field>
+    	<field name="context">{}</field>
+    	<field name="res_model">imp.config</field>
+    	<field name="view_type">form</field>
+
+	</record>
+
+
+	<record id="new_imp_config_tree_view" model="ir.actions.act_window.view">
+		<field eval="10" name="sequence"/>
+		<field name="view_mode">tree</field>
+		<field name="view_id" ref="view_imp_config_tree"/>
+
+		<field name="act_window_id" ref="action_imp_config"/>
+	</record>
+	<record id="view_imp_config_form2" model="ir.actions.act_window.view">
+		<field eval="20" name="sequence"/>
+		<field name="view_mode">form</field>
+		<field name="view_id" ref="view_imp_config_form"/>
+		<field name="act_window_id" ref="action_imp_config"/>
+	</record>
+
+	<menuitem id="imp_config" parent="imp_main_menu" name="Import config" />
+	<menuitem id="imp_config_new" parent="imp_config" name="Import config NEW" action="action_imp_config" sequence="60"/>
+
+
+  </data>
+</openerp>

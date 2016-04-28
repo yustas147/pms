@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+              <!-- product_proxy ################################################# -->
+
+          <record id="product_proxy_form" model="ir.ui.view">
+            <field name="name">product.proxy.form</field>
+            <field name="model">product.proxy</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form>
+                  <sheet>
+                  <group col="8">
+                	<group string="Common data" colspan="2">
+                		<field name="name" />
+                		<field name="supplier_id"  />
+                		<field name="if_etalon"  />
+                	</group>
+                	<group string="Pricelist data" attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="2">
+                		<field name="etalon_id" domain="[('if_etalon','=',True)]" />
+                		<field name="quantity" />
+                		<field name="price" />
+                	</group>
+                	</group>
+                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+                		<tree>
+                			<field name="supplier_id"/>
+                			<field name="quantity"/>
+                			<field name="price"/>
+                		</tree>
+                	</field>
+
+                   </sheet>
+                </form>
+            </field>
+          </record>
+          <record id="product_proxy_tree" model="ir.ui.view">
+            <field name="name">product.proxy.tree</field>
+            <field name="model">product.proxy</field>
+            <field name="arch" type="xml">
+               <tree>
+                	<field name="name" />
+                	<field name="etalon_id" />
+               </tree>
+            </field>
+          </record>
+          
+           <!-- product_product ################################################# -->
+
+          <record id="product_product_proxy_form_inh" model="ir.ui.view">
+            <field name="name">product.normal.form.proxy</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+                	<page string="PMS">
+                		<group>
+                			<field name="proxy_id"/>
+                		</group>
+                			<field name="proxy_ids">
+                			    <tree>
+		                			<field name="supplier_id"/>
+		                			<field name="quantity"/>
+		                			<field name="price"/>
+		                		</tree>
+                			</field>
+                	</page>
+                </xpath>
+            </field>
+          </record>
+          
+           <!-- virt_tire ################################################# -->
+
+          <record id="virt_tire_form" model="ir.ui.view">
+          	<field name="name">virt.tire.form</field>
+          	<field name="model">virt.tire</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+              	<form>
+               		<sheet>
+               		    <group col="8" colspan="2">
+	            			<group name="Common data" >
+	                			<field name="name"/>
+		                		<field name="supplier_id"  />
+		                		<field name="if_etalon"  />
+			                	<field name="tire_brand"/>	
+			                	<field name="tire_model"/>	
+			                	<field name="tire_wsp"/>	
+			                	<field name="tire_wpd"/>	
+	            			</group>
+	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}">
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+	                		    <field name="quantity" />
+	                		    <field name="price" />
+	                	    </group>
+                	    </group>
+	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+	                		<tree>
+	                			<field name="supplier_id"/>
+	                			<field name="quantity"/>
+	                			<field name="price"/>
+	                		</tree>
+	                	</field>
+               		</sheet>
+              	</form>
+         	</field> 
+          </record>
+          
+          <record id="virt_tire_tree" model="ir.ui.view">
+          	<field name="name">virt.tire.tree</field>
+          	<field name="model">virt.tire</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree>
+                			<field name="name"/>
+		                	<field name="tire_brand"/>	
+		                	<field name="tire_model"/>	
+		                	<field name="tire_wsp"/>	
+		                	<field name="tire_wpd"/>	
+                </tree>
+         	</field> 
+          </record>
+
+           <!-- mBrand ################################################# -->
+            <record id="mbrand_form" model="ir.ui.view">
+          	<field name="name">mbrand.form</field>
+          	<field name="model">mbrand</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+              	<form>
+               		<sheet>
+            			<group>
+                			<field name="name"/>
+            			</group>
+               		</sheet>
+              	</form>
+         	</field> 
+          </record>
+          
+          <record id="mbrand_tree" model="ir.ui.view">
+          	<field name="name">mbrand.tree</field>
+          	<field name="model">mbrand</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree>
+                			<field name="name"/>
+                </tree>
+         	</field> 
+          </record>
+           
+
+           <!-- mModel ################################################# -->
+           <record id="mmodel_form" model="ir.ui.view">
+          	<field name="name">mmodel.form</field>
+          	<field name="model">mmodel</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+              	<form>
+               		<sheet>
+            			<group>
+                			<field name="name"/>
+            			</group>
+               		</sheet>
+              	</form>
+         	</field> 
+          </record>
+          
+          <record id="mmodel_tree" model="ir.ui.view">
+          	<field name="name">mmodel.tree</field>
+          	<field name="model">mmodel</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree>
+                			<field name="name"/>
+                </tree>
+         	</field> 
+          </record>
+	</data>
+</openerp>          
