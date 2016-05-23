@@ -14,6 +14,19 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record> 
+        <record model='ir.actions.act_window' id='parse_dict_keys_act'>
+            <field name="name">Parse dict keys</field>
+            <field name="res_model">parse_dict_keys</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record> 
+        <record model='ir.actions.act_window' id='parse_dict_vals_act'>
+            <field name="name">Parse dict vals</field>
+            <field name="res_model">parse_dict_vals</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record> 
+
         
 
         <menuitem name="Price merge system" id="menu_root"/>
@@ -21,6 +34,9 @@
                  <menuitem action="product_proxy_act" parent="technical1_id" id="product_proxy_menu" sequence="10" />
             <menuitem name="Virtual goods" parent="menu_root" id="vg_id" sequence="20"/>
                  <menuitem action="virtual_tire_act" parent="vg_id" id="virtual_tire_menu" sequence="10" />
+            <menuitem name="Parsing dictionaries" parent="menu_root" id="dict_data_id" sequence="30"/>
+                 <menuitem action="parse_dict_keys_act" parent="dict_data_id" id="parse_dict_keys_menu" sequence="10" />
+                 <menuitem action="parse_dict_vals_act" parent="dict_data_id" id="parse_dict_vals_menu" sequence="20" />
     </data>
 
 

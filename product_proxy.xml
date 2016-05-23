@@ -79,6 +79,10 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
               	<form>
+              	    <header>
+	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
+	                   <button name="parse_brand" string="Parse brand" type="object" />	
+				    </header>
                		<sheet>
                		    <group col="8" colspan="2">
 	            			<group name="Common data" >

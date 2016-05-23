@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="parse_dict_keys_tree" model="ir.ui.view">
+			<field name="name">parse_dict_keys.tree</field>
+			<field name="model">parse_dict_keys</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<tree string="Parse dict">
+				    <field name="name"/>
+				    <field name="type"/>
+				    <field name="value_ids"/>
+				</tree>
+			</field>
+				
+		</record>
+		<record id="parse_dict_vals_tree" model="ir.ui.view">
+			<field name="name">parse_dict_vals.tree</field>
+			<field name="model">parse_dict_vals</field>
+			<field name="type">tree</field>
+			<field name="arch" type="xml">
+				<tree string="Parse dict vals">
+				        <field name="name"/>
+				        <field name="type"/>
+				        <field name="parse_key_id"/>
+				</tree>
+			</field>
+				
+		</record>
+		
+		<record id="parse_dict_keys" model="ir.ui.view">
+			<field name="name">parse_dict_keys.form</field>
+			<field name="model">parse_dict_keys</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Parse dict form">
+				<header>
+	               <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
+				</header>
+				<sheet>
+					<group>
+				        <field name="name"/>
+						<field name="type"/>
+					 	<field name="value_ids"/> 
+					</group>
+				</sheet>
+				</form>
+			</field>
+		</record>
+		<record id="parse_dict_vals" model="ir.ui.view">
+			<field name="name">parse_dict_vals.form</field>
+			<field name="model">parse_dict_vals</field>
+			<field name="type">form</field>
+			<field name="arch" type="xml">
+				<form string="Parse dict vals form">
+				<header></header>
+				<sheet>
+					<group>
+				        <field name="name"/>
+						<field name="type"/>
+					 	<field name="parse_key_id"/> 
+					</group>
+				</sheet>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>
