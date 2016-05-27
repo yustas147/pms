@@ -42,6 +42,8 @@
 				        <field name="name"/>
 						<field name="type"/>
 					 	<field name="value_ids"/> 
+					 	<field name="parent_key"/> 
+					 	<field name="child_keys"/> 
 					</group>
 				</sheet>
 				</form>
