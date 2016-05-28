@@ -13,6 +13,8 @@
                     <field name="name" colspan="2"/>
 <!--                     <field name="name" readonly="1" colspan="2"/> -->
                     <newline/>
+                    <field name="data_type" colspan="2"/>
+
                     <button name="get_prod_fields" string="Update product fields" colspan="2" type="object" icon="gtk-ok" />
                     <button name="set_imp_prod_fields" string="Set imp fields" colspan="2" type="object" icon="gtk-ok" />
 

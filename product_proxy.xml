@@ -21,6 +21,7 @@
                 		<field name="etalon_id" domain="[('if_etalon','=',True)]" />
                 		<field name="quantity" />
                 		<field name="price" />
+               			<field name="default_code"/>
                 	</group>
                 	</group>
                 	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
@@ -56,8 +57,9 @@
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
                 	<page string="PMS">
-                		<group>
+                		<group colspan="4">
                 			<field name="proxy_id"/>
+                		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
                 		</group>
                 			<field name="proxy_ids">
                 			    <tree>
@@ -104,6 +106,7 @@
 	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
 	                		    <field name="quantity" />
 	                		    <field name="price" />
+                     			<field name="default_code"/>
 	                	    </group>
                 	    </group>
 	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
@@ -129,6 +132,75 @@
 		                	<field name="tire_model"/>	
 		                	<field name="tire_wsp"/>	
 		                	<field name="tire_wpd"/>	
+                			<field name="default_code"/>
+                </tree>
+         	</field> 
+          </record>
+          
+          <!-- virt_disk ################################################# -->
+
+          <record id="virt_disk_form" model="ir.ui.view">
+          	<field name="name">virt.disk.form</field>
+          	<field name="model">virt.disk</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+              	<form>
+              	    <header>
+	                   <!-- <button name="parse_all_name" string="Parse all name" type="object" />	
+	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
+	                   <button name="parse_brand" string="Parse brand" type="object" />	
+	                   <button name="parse_model" string="Parse model" type="object" />	
+	                   <button name="parse_wpd" string="Parse wpd" type="object" />	
+	                   <button name="parse_wsp" string="Parse wsp" type="object" />	
+	                   <button name="parse_studness" string="Parse studness" type="object" />	 -->
+				    </header>
+               		<sheet>
+               		    <group col="8" colspan="2">
+	            			<group name="Common data" >
+	                			<field name="name"/>
+		                		<field name="supplier_id"  />
+		                		<field name="if_etalon"  />
+			                	<field name="brand"/>	
+			                	<field name="model"/>	
+			                	<field name="wrsize"/>	
+			                	<field name="pcd"/>	
+			                	<field name="et"/>	
+			                	<field name="dia"/>	
+			                	<field name="paint"/>	
+	            			</group>
+	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}">
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+	                		    <field name="quantity" />
+	                		    <field name="price" />
+                    			<field name="default_code"/>
+	                	    </group>
+                	    </group>
+	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+	                		<tree>
+	                			<field name="supplier_id"/>
+	                			<field name="quantity"/>
+	                			<field name="price"/>
+	                		</tree>
+	                	</field>
+               		</sheet>
+              	</form>
+         	</field> 
+          </record>
+          
+          <record id="virt_disk_tree" model="ir.ui.view">
+          	<field name="name">virt.disk.tree</field>
+          	<field name="model">virt.disk</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+            	<tree>
+                			<field name="name"/>
+		                	<field name="brand"/>	
+		                	<field name="model"/>	
+		                	<field name="wrsize"/>	
+		                	<field name="pcd"/>	
+		                	<field name="et"/>	
+		                	<field name="dia"/>	
+		                	<field name="paint"/>	
                 </tree>
          	</field> 
           </record>

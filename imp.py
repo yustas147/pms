@@ -224,26 +224,35 @@ class imp(osv.osv):
                 f_names_bool_true.append(attr.replace('x_bool_','x_'))
 
         li = [ getattr(inst, fld) for fld in f_names_bool_true]
-        for pos in li:
-            if li.count(pos)>1:
-                raise osv.except_osv('Warning', 'Duplicated field position !')
+        #yustas
+#         for pos in li:
+#             if li.count(pos)>1:
+#                 raise osv.except_osv('Warning', 'Duplicated field position !')
                 #raise osv.except_osv(_('Warning'), _('Duplicated field position !'))
 
         di = {}
         for fld in f_names_bool_true:
-            di[getattr(inst, fld)] = fld
+#            di[getattr(inst, fld)] = fld
+#yustas
+            di[fld] = getattr(inst, fld)
 
         st=st_main=''
         keys = di.keys()
-        keys.sort()
+     #   values = di.values()
+     #   keys.sort()
+        
         for key in keys:
-            st += ' %s - #%d; ' % (fields[di[key]]['string'], key)
-            st_main += "%d:'%s'," % (key-1, di[key].replace('x_',''))
+            st += ' %s - #%d; ' % (fields[key]['string'], di[key])
+            st_main += "%s:'%d'," % (key.replace('x_',''),di[key]-1)
+
+#         for key in keys:
+#             st += ' %s - #%d; ' % (fields[di[key]]['string'], key)
+#             st_main += "%d:'%s'," % (key-1, di[key].replace('x_',''))
         st_main = '{'+st_main[:-1]+'}'
         done = self.write(cr, uid, inst.id, {'import_order':st})
         done = self.write(cr, uid, inst.id, {'import_order_main':st_main})
-        # fucking debug by @podarok // Drupal way! we need comments for code!!!!
-        # raise osv.except_osv(_('Warning'), st_main)
+        
+        
 
 
         return True
@@ -346,10 +355,11 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
 # yustas
     
     qty_pos = fields.index('quantity')
-#    qty_pos = fields.index('imp_qty')
     price_pos = fields.index('price')
+    defcode_pos = fields.index('default_code')
+    name_pos = fields.index('name')
+#    qty_pos = fields.index('imp_qty')
 #    price_pos = fields.index('standard_price')
-    defcode_pos = fields.index('name')
 #    defcode_pos = fields.index('default_code')
 #    name_pos = fields.index('name')
 

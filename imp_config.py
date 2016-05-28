@@ -19,6 +19,7 @@ class imp_config(osv.osv):
     _columns = {
         'name': fields.char('Name', size=64),
         'import_fields_types': fields.text('Fields types'),
+        'data_type': fields.selection([('virt.tire','Virtual tire'), ('virt.disk','Virtual disk')],string='Choose the data model type: tyre, disk, etc.')
     }
     _auto = True
 
@@ -30,8 +31,8 @@ class imp_config(osv.osv):
     def get_prod_fields(self, cr, uid, ids, context={}):
 
         inst = self.browse(cr, uid, ids)[0]
-        fields = self.pool.get('product.proxy').fields_get(cr,1)
-#        fields = self.pool.get('product.product').fields_get(cr,1)
+        fields = self.pool.get(inst.data_type).fields_get(cr,1)
+#        fields = self.pool.get('product.proxy').fields_get(cr,1)
 
         imp_model_id = self.pool.get('ir.model').search(cr, 1, [('model','=','imp.config')])[0]
         #imp_form_ids = self.pool.get('ir.ui.view').search(cr, 1, [('name','=','imp.config.form')])
@@ -79,8 +80,8 @@ class imp_config(osv.osv):
                 if getattr(inst,key):
                     allowed_fields.append(key[7:])
 
-        fields = self.pool.get('product.proxy').fields_get(cr,1)
-#        fields = self.pool.get('product.product').fields_get(cr,1)
+        fields = self.pool.get(inst.data_type).fields_get(cr,1)
+#        fields = self.pool.get('product.proxy').fields_get(cr,1)
 
         imp_model_id = self.pool.get('ir.model').search(cr, 1, [('model','=','imp.imp')])[0]
         imp_form_id = self.pool.get('ir.ui.view').search(cr, 1, [('name','=','imp.imp.form')])[0]

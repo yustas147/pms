@@ -16,8 +16,11 @@ class product_proxy(models.Model):
     supplier_id = fields.Many2one('res.partner', string='Supplier')
     if_etalon = fields.Boolean('Is it etalon?')
     quantity = fields.Integer('Suppliers quantity')
-    price = fields.Integer('Suppliers price')
+    price = fields.Float('Suppliers price')
+#    price = fields.Integer('Suppliers price')
     proxy_ids = fields.One2many('product.proxy', 'etalon_id', string='Supplier`s info')
+    uid_spl = fields.Char(string='Unique identifier of price list position', help='Usually, supp_price_list_name+suppliers article the thing')
+    default_code = fields.Char('Code in pricelist', help='must be unique inside price list')
     
 class product_product(models.Model):
     _name = 'product.product'
@@ -26,6 +29,17 @@ class product_product(models.Model):
     proxy_id = fields.Many2one('product.proxy')
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
     #proxy_ids = fields.One2many()
+    
+    @api.multi
+    @api.model
+    def create_proxy(self):
+        print unicode(self.proxy_id)
+        if not self.proxy_id:
+            rset_proxy = self.env['product.proxy'].create({'name':self.name, 'if_etalon':True})
+            print unicode(rset_proxy)
+            rset_proxy.ensure_one()
+            
+            self.proxy_id = rset_proxy[0].id
     
 class mBrand(models.Model):
 
@@ -36,6 +50,22 @@ class mModel(models.Model):
     _name = 'mmodel'
     
     name = fields.Char('Brand')
+
+
+class virt_disk(models.Model):
+    _name = 'virt.disk'
+    _inherits = {'product.proxy':'proxy_id'}
+    
+    brand = fields.Char('Brand') 
+#    tire_brand = fields.Many2one('mbrand') 
+    model = fields.Char('Model') 
+    wrsize = fields.Char('WRSize', help='width of wheel in inches x radius oboda (6,5j x 15)')
+    pcd = fields.Char('PCD', help='quantity and diameter of mounting bores (4х98)') 
+    et = fields.Char('ET', help='Vylet diska (32)')
+    dia = fields.Char('DIA', help='diameter centrovochnogo otverstiya na diske (67.1)')
+    paint = fields.Char('Paint')
+    #tire_model = fields.Many2one('mmodel') 
+
 
 class virt_tire(models.Model):
     _name = 'virt.tire'
@@ -49,7 +79,7 @@ class virt_tire(models.Model):
     tire_wpd = fields.Char('Dimensions')
     tire_studness = fields.Selection([('n/s','Non-studded'),('studded','Studded'),('studdable','Studdable')],string='Studness')
     name_unparsed = fields.Char('Left for parsing')
-    
+
 #     @api.multi
 #     @api.model
 #     def parse_name_all_sel_ids(self):
