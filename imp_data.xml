@@ -22,7 +22,7 @@
 			<form string="Import" version="7.0">
               <notebook colspan="4">
                 <page string="General">
-                 <group colspan="4" col="18">
+                 <group colspan="4" col="12">
                   <group colspan="5">
                     <label string="Supplier"/>
                     <newline/>
@@ -32,11 +32,11 @@
                     <newline/>
 					<field name="model_name" nolabel="1" />
                   </group>
-                  <group colspan="5">
+                  <!-- <group colspan="5">
                     <label string="Categoty"/>
                     <newline/>
 					<field name="category_id" nolabel="1" />
-                  </group>
+                  </group> -->
                   <group colspan="2">
                     <label string="Type of File"/>
                     <newline/>
@@ -49,17 +49,18 @@
                   </group>
 
                   <group colspan="2">
-                    <label string="Numbers of sheet and line" colspan="4" />
+                    <label string="Numbers of sheet and line"/>
                     <newline/>
 					<field name="sheet_num" nolabel="1"/>
+                    <newline/>
 					<field name="line_start" nolabel="1"/>
                   </group>
 
-                  <group colspan="2">
+                   <group colspan="2">
                     <label string="Etalon catalog"/>
                     <newline/>
 					<field name="etalon_catalog" nolabel="1"/>
-                  </group>
+                  </group> 
                   <newline/>
                   <notebook colspan="8">
                     <page string="File ">
@@ -111,6 +112,7 @@
                    <group colspan="4" col="24">
                         <field name="import_order" colspan="20" />
                         <button name="set_import_order" string="Set chosen order" colspan="2" type="object" icon="gtk-ok" />
+                        <newline/>
                         <field name="hide_unused" colspan="2" />
                         <newline/>
 
@@ -133,7 +135,7 @@
 			<!-- <tree string="Import tree view" colors="blue:state=='approved';red:state=='draft'"> -->
         	  		<field name="name" />
                     <field name="imp_type" />
-					<field name="etalon_catalog" />
+<!-- 					<field name="etalon_catalog" /> -->
                     <field name="last_import" />
                     <field name="unconect_count" />
                     <button name="show_unconnected" string="Browse" colspan="2" type="object" icon="gtk-go-forward" />

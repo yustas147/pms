@@ -2,8 +2,9 @@
 
 from openerp import models, fields, api
 #import parser
-from parser import brandParser, modelParser, wpdParser, wspParser, studnessParser   
-from openerp.osv import osv     
+from parser import brandParser, modelParser, wpdParser, wspParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser
+from openerp.osv import osv
+from openerp.tools.translate import _
 
 
 
@@ -22,24 +23,56 @@ class product_proxy(models.Model):
     uid_spl = fields.Char(string='Unique identifier of price list position', help='Usually, supp_price_list_name+suppliers article the thing')
     default_code = fields.Char('Code in pricelist', help='must be unique inside price list')
     
+    @api.multi
+    @api.model
+    def get_lower_price(self):
+        res = False
+        try:
+            res = min([inst.price for inst in self.proxy_ids if inst.quantity != 0])
+            if res < 0.1:
+                return False
+        except ValueError:
+            return res
+        print res
+        return res
+            
+    
 class product_product(models.Model):
     _name = 'product.product'
     _inherit = 'product.product'
     
-    proxy_id = fields.Many2one('product.proxy')
+    proxy_id = fields.Many2one('product.proxy', domain="[('if_etalon', '=', True)]")
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
+    virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
     #proxy_ids = fields.One2many()
     
+    
+    @api.multi
+    @api.model
+    def set_lowest_lst_price(self):
+       newprice = self.proxy_id.get_lower_price() 
+       if newprice:
+           self.lst_price = newprice
+        
+        
+        
     @api.multi
     @api.model
     def create_proxy(self):
         print unicode(self.proxy_id)
+        if not self.virtual_type:
+            return {
+                    'warning':{
+                               'title': _("Achtung!!!!"),
+                               'message': _("Virtual type must be selected!!!")
+                               }
+                    }
         if not self.proxy_id:
-            rset_proxy = self.env['product.proxy'].create({'name':self.name, 'if_etalon':True})
+            rset_proxy = self.env[self.virtual_type].create({'name':self.name, 'if_etalon':True})
             print unicode(rset_proxy)
             rset_proxy.ensure_one()
             
-            self.proxy_id = rset_proxy[0].id
+            self.proxy_id = rset_proxy[0].proxy_id.id
     
 class mBrand(models.Model):
 
@@ -64,7 +97,70 @@ class virt_disk(models.Model):
     et = fields.Char('ET', help='Vylet diska (32)')
     dia = fields.Char('DIA', help='diameter centrovochnogo otverstiya na diske (67.1)')
     paint = fields.Char('Paint')
+    country = fields.Char('Country')
+    type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
     #tire_model = fields.Many2one('mmodel') 
+    
+    @api.multi 
+    @api.model
+    def parse_paint(self):
+        parser = paintParser(parse_string=self.name, dict_type='disk_color' )
+        parsed_brand, name_minus_brand = parser.parse()
+        if parsed_brand :
+            self.paint = parsed_brand
+            self.name_unparsed = name_minus_brand
+        else:
+            print "########## Painting not found in name: "+ unicode(self.name)
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_wrsize(self):
+        parser = wxrParser(self.name)
+        parsed_wpd, name_minus_wpd = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_wpd :
+            self.wrsize = parsed_wpd.lower()
+            self.name_unparsed = name_minus_wpd
+        else:
+            print "########## wrsize not found in name: "+ unicode(self.name)
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_pcd(self):
+        parser = pcdParser(self.name)
+        parsed_wpd, name_minus_wpd = parser.parse()
+        if parsed_wpd :
+            self.pcd = parsed_wpd.lower()
+            self.name_unparsed = name_minus_wpd
+        else:
+            print "########## pcd not found in name: "+ unicode(self.name)
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_dia(self):
+        parser = diaParser(self.name)
+        parsed_wpd, name_minus_wpd = parser.parse()
+        if parsed_wpd :
+            self.dia = parsed_wpd.lower()
+            self.name_unparsed = name_minus_wpd
+        else:
+            print "########## dia not found in name: "+ unicode(self.name)
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_et(self):
+        parser = etParser(self.name)
+        parsed_wpd, name_minus_wpd = parser.parse()
+        if parsed_wpd :
+            self.et = parsed_wpd.lower()
+            self.name_unparsed = name_minus_wpd
+        else:
+            print "########## dia not found in name: "+ unicode(self.name)
+        return True
 
 
 class virt_tire(models.Model):
@@ -79,11 +175,15 @@ class virt_tire(models.Model):
     tire_wpd = fields.Char('Dimensions')
     tire_studness = fields.Selection([('n/s','Non-studded'),('studded','Studded'),('studdable','Studdable')],string='Studness')
     name_unparsed = fields.Char('Left for parsing')
+    etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',True)]", string = 'Select etalonic tire')
+    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
+#    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
 
-#     @api.multi
-#     @api.model
-#     def parse_name_all_sel_ids(self):
-#         ids = context.get('active_ids',[])
+    
+    @api.one
+    def _get_etalonic_ids(self):
+        et_rset = self.search([('tire_wpd', '=', self.tire_wpd), ('tire_wsp', '=', self.tire_wsp), ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
+        self.etalonic_list = et_rset
     
     def parse_name_all_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
@@ -103,10 +203,8 @@ class virt_tire(models.Model):
     @api.multi
     @api.model
     def get_parser_dict(self, dict_type='brand', parent_key=False):
-#    def get_parser_dict(self, dict_type='brand'):
         
         key_pool = self.env['parse_dict_keys']
-#        val_pool = self.env['parse_dict_vals']
         res = {}
         
         if parent_key:
@@ -126,26 +224,37 @@ class virt_tire(models.Model):
                     res[k_n].append(v.name)
                 res[k_n].sort(key=len, reverse=True)
         return res
+# 
+#     @api.multi 
+#     @api.model
+#     def parse_brand(self, dt='tyre_brand'):
+#         parser_dict = self.get_parser_dict(dt)
+#         parser = brandParser(parser_dict, self.name)
+#         parsed_brand, name_minus_brand = parser.parse()
+# #        parsed_brand, name_minus_brand = parser.parse(self.name)
+#         if parsed_brand :
+#             self.tire_brand = parsed_brand
+#             self.name_unparsed = name_minus_brand
+#         else:
+#             print "########## brand not found in name: "+ unicode(self.name)
+#         return True
 
     @api.multi 
     @api.model
-    def parse_brand(self, dt='tyre_brand'):
-        parser_dict = self.get_parser_dict(dt)
-        parser = brandParser(parser_dict, self.name)
+    def parse_brand(self):
+        parser = brandParser(parse_string=self.name)
         parsed_brand, name_minus_brand = parser.parse()
-#        parsed_brand, name_minus_brand = parser.parse(self.name)
         if parsed_brand :
             self.tire_brand = parsed_brand
             self.name_unparsed = name_minus_brand
         else:
             print "########## brand not found in name: "+ unicode(self.name)
         return True
-
+    
     @api.multi 
     @api.model
-    def parse_studness(self, dt='studness'):
-        parser_dict = self.get_parser_dict(dt)
-        parser = studnessParser(parser_dict, self.name)
+    def parse_studness(self):
+        parser = studnessParser(parse_string=self.name, dict_type='studness')
         parsed_brand, name_minus_brand = parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
         if parsed_brand :
@@ -156,11 +265,24 @@ class virt_tire(models.Model):
             self.tire_studness = 'n/s'
         return True
     
+#     @api.multi 
+#     @api.model
+#     def parse_model(self, dt='tyre_model'):
+#         parser_dict = self.get_parser_dict(dt,parent_key=self.tire_brand)
+#         parser = modelParser(parser_dict, self.name)
+#         parsed_model, name_minus_model = parser.parse()
+# #        parsed_brand, name_minus_brand = parser.parse(self.name)
+#         if parsed_model :
+#             self.tire_model = parsed_model
+#             self.name_unparsed = name_minus_model
+#         else:
+#             print "########## model not found in name: "+ unicode(self.name)
+#         return True
+
     @api.multi 
     @api.model
-    def parse_model(self, dt='tyre_model'):
-        parser_dict = self.get_parser_dict(dt,parent_key=self.tire_brand)
-        parser = modelParser(parser_dict, self.name)
+    def parse_model(self):
+        parser = modelParser(parse_string=self.name, dict_type='tyre_model', parent_key=self.tire_brand)
         parsed_model, name_minus_model = parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
         if parsed_model :
@@ -168,7 +290,7 @@ class virt_tire(models.Model):
             self.name_unparsed = name_minus_model
         else:
             print "########## model not found in name: "+ unicode(self.name)
-        return True
+        return True 
     
     @api.multi 
     @api.model
@@ -181,7 +303,6 @@ class virt_tire(models.Model):
             self.name_unparsed = name_minus_wpd
         else:
             print "########## wpd not found in name: "+ unicode(self.name)
-        #print parser
         return True
 
     @api.multi 
@@ -195,6 +316,5 @@ class virt_tire(models.Model):
             self.name_unparsed = name_minus_wpd
         else:
             print "########## wsp not found in name: "+ unicode(self.name)
-        #print parser
         return True
 

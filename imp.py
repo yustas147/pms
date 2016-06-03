@@ -150,11 +150,14 @@ class imp(osv.osv):
             raise osv.except_osv('Warning', 'Please, set fields order first !')
             #raise osv.except_osv(_('Warning'), _('Please, set fields order first !'))
         fields_dict = eval(fields_str)
+        #yustas
         fields=[]
-        poss = fields_dict.keys()
-        poss.sort()
-        for key in poss:
-            fields.append(fields_dict[key])
+        poss = fields_dict.values()
+        #poss = fields_dict.keys()
+       # poss.sort()
+#        for key in poss:
+#            fields.append(fields_dict[key])
+        fields = fields_dict.keys()
 
         sheet_line_poss = [inst.sheet_num-1, inst.line_start-1]
         arrgs = (cr, inst, source, fields, poss, sheet_line_poss, inst.model_name)
@@ -177,7 +180,8 @@ class imp(osv.osv):
                     }
             else:
                 if inst.etalon_catalog:
-                    res = tmp_xls_import_etalon(*arrgs)
+                    res = tmp_xls_import(*arrgs)
+#                    res = tmp_xls_import_etalon(*arrgs)
                 else:
                     res = tmp_xls_import(*arrgs)
         else:
@@ -243,7 +247,7 @@ class imp(osv.osv):
         
         for key in keys:
             st += ' %s - #%d; ' % (fields[key]['string'], di[key])
-            st_main += "%s:'%d'," % (key.replace('x_',''),di[key]-1)
+            st_main += "'%s':%d," % (key.replace('x_',''),di[key]-1)
 
 #         for key in keys:
 #             st += ' %s - #%d; ' % (fields[di[key]]['string'], key)
@@ -445,111 +449,115 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
     if error_rows_list:
         report += u'\n\t- %s: %s' % (('could not import records on rows'),str(error_rows_list)[1:-1])
         #report += u'\n\t- %s: %s' % (_('could not import records on rows'),str(error_rows_list)[1:-1])
+    if inst.etalon_catalog:
+        fields += ['if_etalon']
+        for l in datas:
+            l.append('True')
 
     return product_pool.import_data(cr, uid, fields, datas), report
 
 #===============================================================================
 #===============================================================================
 
-def tmp_xls_import_etalon(cr, inst, source, fields, poss, sheet_line_poss):
-
-    pool = pooler.get_pool(cr.dbname)
-    orig_fields = copy(fields)
-    etalon_supplier = inst.name.id
-    logger = logging.getLogger('imp')
-    product_pool = pool.get('product.product')
-    uid = 1
-    datas = []
-
-    config_ids = pool.get('imp.config').search(cr,1,[])
-    config = pool.get('imp.config').browse(cr,1,config_ids)[0]
-    fields_types = eval(config.import_fields_types)
-
-    sheet = source.sheets()[sheet_line_poss[0]]
-    fields += ['supplier.id']
-    category = inst.category_id
-    if category:
-        fields += ['categ_id.id']
-# required fields Name and Reference (SKU)
-#yustas
-    name_pos = fields.index('name')
-    code_pos = fields.index('default_code')
-
-    new_prod_count = 0
-    exist_prod_count = 0
-    error_rows_list = []
-
-    for row in xrange(sheet_line_poss[1],sheet.nrows):
-        vals = []
-        itr = 0
-        try:
-            for col in poss:
-                cell_value = sheet.cell(row,col).value
-                cell_type = sheet.cell(row,col).ctype
-                fld = fields[itr]
-                if cell_type == 2:
-                    if fields_types[fld]=='char':
-                            if isinstance(cell_value,float):
-                                if modf(cell_value)[0]:
-                                    cell_value = str(cell_value)
-                                else:
-                                    cell_value = str(int(cell_value))
-                else:
-                    if fields_types[fld]=='float':
-                        try:
-                            if cell_value:
-                                cell_value = float(cell_value)
-                            else:
-                                cell_value = 0.0
-                        except:
-                            if isinstance (cell_value,str) or isinstance (cell_value,unicode):
-                                cell_value = cell_value.replace(',','.')
-                                cell_value = float(cell_value)
-                    if fields_types[fld]=='int':
-                        if cell_value:
-                            cell_value = int(cell_value)
-                        else:
-                            cell_value = 0
-
-                vals.append(cell_value)
-                itr += 1
-        except:
-            vals = []
-            error_rows_list.append(row+1)
-            #logger.error("Cannot import the line #%s", row+1)
-        if any(vals):
-            exist_ids = product_pool.search(cr, uid, [('default_code','=',vals[code_pos]),('supplier','=',etalon_supplier)])
-            if not exist_ids:
-                vals += [etalon_supplier]
-                if category:
-                    vals += [category]
-                datas.append(vals)
-                new_prod_count += 1
-            else:
-                exist_data = product_pool.read(cr, uid, exist_ids[0], orig_fields)
-                exist_id = exist_data['id']
-                di = {}
-                for i in range(len(orig_fields)):
-                    di[orig_fields[i]] = vals[i]
-                wr = {}
-                for key in di:
-                    if di[key]:
-                        if di[key]!=exist_data[key]:
-                            wr[key]=vals[orig_fields.index(key)]
-                if wr:
-                    product_pool.write(cr, uid, exist_id, wr)
-                exist_prod_count += 1
-
-    report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,('records imported'))
-    #report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,_('records imported'))
-    report += u'\n\t- %d %s' % (new_prod_count,('records created'))
-    #report += u'\n\t- %d %s' % (new_prod_count,_('records created'))
-    report += u'\n\t- %d %s' % (exist_prod_count,('records updated'))
-    #report += u'\n\t- %d %s' % (exist_prod_count,_('records updated'))
-    if error_rows_list:
-        report += u'\n\t- %s: %s' % (_('could not import records on rows'),str(error_rows_list)[1:-1])
-
-    return product_pool.import_data(cr, uid, fields, datas),report
+# def tmp_xls_import_etalon(cr, inst, source, fields, poss, sheet_line_poss):
+# 
+#     pool = pooler.get_pool(cr.dbname)
+#     orig_fields = copy(fields)
+#     etalon_supplier = inst.name.id
+#     logger = logging.getLogger('imp')
+#     product_pool = pool.get('product.product')
+#     uid = 1
+#     datas = []
+# 
+#     config_ids = pool.get('imp.config').search(cr,1,[])
+#     config = pool.get('imp.config').browse(cr,1,config_ids)[0]
+#     fields_types = eval(config.import_fields_types)
+# 
+#     sheet = source.sheets()[sheet_line_poss[0]]
+#     fields += ['supplier.id']
+#     category = inst.category_id
+#     if category:
+#         fields += ['categ_id.id']
+# # required fields Name and Reference (SKU)
+# #yustas
+#     name_pos = fields.index('name')
+#     code_pos = fields.index('default_code')
+# 
+#     new_prod_count = 0
+#     exist_prod_count = 0
+#     error_rows_list = []
+# 
+#     for row in xrange(sheet_line_poss[1],sheet.nrows):
+#         vals = []
+#         itr = 0
+#         try:
+#             for col in poss:
+#                 cell_value = sheet.cell(row,col).value
+#                 cell_type = sheet.cell(row,col).ctype
+#                 fld = fields[itr]
+#                 if cell_type == 2:
+#                     if fields_types[fld]=='char':
+#                             if isinstance(cell_value,float):
+#                                 if modf(cell_value)[0]:
+#                                     cell_value = str(cell_value)
+#                                 else:
+#                                     cell_value = str(int(cell_value))
+#                 else:
+#                     if fields_types[fld]=='float':
+#                         try:
+#                             if cell_value:
+#                                 cell_value = float(cell_value)
+#                             else:
+#                                 cell_value = 0.0
+#                         except:
+#                             if isinstance (cell_value,str) or isinstance (cell_value,unicode):
+#                                 cell_value = cell_value.replace(',','.')
+#                                 cell_value = float(cell_value)
+#                     if fields_types[fld]=='int':
+#                         if cell_value:
+#                             cell_value = int(cell_value)
+#                         else:
+#                             cell_value = 0
+# 
+#                 vals.append(cell_value)
+#                 itr += 1
+#         except:
+#             vals = []
+#             error_rows_list.append(row+1)
+#             #logger.error("Cannot import the line #%s", row+1)
+#         if any(vals):
+#             exist_ids = product_pool.search(cr, uid, [('default_code','=',vals[code_pos]),('supplier','=',etalon_supplier)])
+#             if not exist_ids:
+#                 vals += [etalon_supplier]
+#                 if category:
+#                     vals += [category]
+#                 datas.append(vals)
+#                 new_prod_count += 1
+#             else:
+#                 exist_data = product_pool.read(cr, uid, exist_ids[0], orig_fields)
+#                 exist_id = exist_data['id']
+#                 di = {}
+#                 for i in range(len(orig_fields)):
+#                     di[orig_fields[i]] = vals[i]
+#                 wr = {}
+#                 for key in di:
+#                     if di[key]:
+#                         if di[key]!=exist_data[key]:
+#                             wr[key]=vals[orig_fields.index(key)]
+#                 if wr:
+#                     product_pool.write(cr, uid, exist_id, wr)
+#                 exist_prod_count += 1
+# 
+#     report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,('records imported'))
+#     #report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,_('records imported'))
+#     report += u'\n\t- %d %s' % (new_prod_count,('records created'))
+#     #report += u'\n\t- %d %s' % (new_prod_count,_('records created'))
+#     report += u'\n\t- %d %s' % (exist_prod_count,('records updated'))
+#     #report += u'\n\t- %d %s' % (exist_prod_count,_('records updated'))
+#     if error_rows_list:
+#         report += u'\n\t- %s: %s' % (_('could not import records on rows'),str(error_rows_list)[1:-1])
+# 
+#     return product_pool.import_data(cr, uid, fields, datas),report
 
 #===============================================================================
 #===============================================================================

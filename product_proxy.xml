@@ -10,6 +10,9 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form>
+                  <head>
+                	  <button name='get_lower_price' type='object' string='Get lower price' />
+                  </head>
                   <sheet>
                   <group col="8">
                 	<group string="Common data" colspan="2">
@@ -42,7 +45,8 @@
             <field name="arch" type="xml">
                <tree>
                 	<field name="name" />
-                	<field name="etalon_id" />
+ 	               	<field name="etalon_id" />
+               		<field name="if_etalon"  />
                </tree>
             </field>
           </record>
@@ -58,8 +62,10 @@
                 <xpath expr="//notebook" position="inside">
                 	<page string="PMS">
                 		<group colspan="4">
+                			<field name="virtual_type"/>
                 			<field name="proxy_id"/>
                 		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
+                		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
                 		</group>
                 			<field name="proxy_ids">
                 			    <tree>
@@ -91,8 +97,8 @@
 	                   <button name="parse_studness" string="Parse studness" type="object" />	
 				    </header>
                		<sheet>
-               		    <group col="8" colspan="2">
-	            			<group name="Common data" >
+               		    <group>
+	            			<group name="Common data" colspan="1">
 	                			<field name="name"/>
 		                		<field name="supplier_id"  />
 		                		<field name="if_etalon"  />
@@ -102,12 +108,19 @@
 			                	<field name="tire_wpd"/>	
 			                	<field name="tire_studness"/>	
 	            			</group>
-	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}">
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="1">
 	                		    <field name="quantity" />
 	                		    <field name="price" />
                      			<field name="default_code"/>
-	                	    </group>
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+	                		    <field name="etalonic_select" />
+	                		    <field name="etalonic_list" nolabel="1" colspan="2" >
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
+	                		    
+	                	    </group>	
                 	    </group>
 	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
 	                		<tree>
@@ -133,6 +146,8 @@
 		                	<field name="tire_wsp"/>	
 		                	<field name="tire_wpd"/>	
                 			<field name="default_code"/>
+	                		<field name="if_etalon"  />
+
                 </tree>
          	</field> 
           </record>
@@ -146,6 +161,11 @@
             <field name="arch" type="xml">
               	<form>
               	    <header>
+	                   <button name="parse_wrsize" string="Parse WRSize" type="object" />	
+	                   <button name="parse_pcd" string="Parse PCD" type="object" />	
+	                   <button name="parse_dia" string="Parse DIA" type="object" />	
+	                   <button name="parse_et" string="Parse ET" type="object" />	
+	                   <button name="parse_paint" string="Parse Painting" type="object" />	
 	                   <!-- <button name="parse_all_name" string="Parse all name" type="object" />	
 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
 	                   <button name="parse_brand" string="Parse brand" type="object" />	
@@ -167,6 +187,8 @@
 			                	<field name="et"/>	
 			                	<field name="dia"/>	
 			                	<field name="paint"/>	
+			                	<field name="type"/>	
+			                	<field name="country"/>	
 	            			</group>
 	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}">
 	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
@@ -201,6 +223,9 @@
 		                	<field name="et"/>	
 		                	<field name="dia"/>	
 		                	<field name="paint"/>	
+	                		<field name="if_etalon"  />
+     	                	<field name="type"/>	
+		                	<field name="country"/>	
                 </tree>
          	</field> 
           </record>
