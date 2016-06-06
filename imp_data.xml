@@ -3,7 +3,7 @@
   <data>
 
   	<record model="ir.actions.act_window" id="action_imp_show_instances">
-    		<field name="name">Import instances action real</field>
+    		<field name="name">... import</field>
     		<field name="type">ir.actions.act_window</field>
    	        <field name="domain">[]</field>
     	    <field name="context">{}</field> 
@@ -156,8 +156,8 @@
 		<field name="view_id" ref="view_imp_form"/>
 		<field name="act_window_id" ref="action_imp_show_instances"/>
 	</record> -->
- <menuitem id="imp_main_menu" name="Easy Import menuitem" icon="STOCK_MEDIA_PLAY" sequence="50"/>
-        <menuitem id="imp_instances" parent="imp_main_menu" name="Import xxx instances action"  />
+ <menuitem id="imp_main_menu" name="Easy Import" icon="STOCK_MEDIA_PLAY" sequence="50"/>
+        <menuitem id="imp_instances" parent="imp_main_menu" name="Instance ..."  />
 
  <menuitem
             action="action_imp_show_instances"
