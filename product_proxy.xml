@@ -161,22 +161,23 @@
             <field name="arch" type="xml">
               	<form>
               	    <header>
+	                   <button name="parse_all_name" string="Parse all name" type="object" />	
+	                   <button name="parse_brand" string="Parse brand" type="object" />	
+	                   <button name="parse_model" string="Parse model" type="object" />	
 	                   <button name="parse_wrsize" string="Parse WRSize" type="object" />	
 	                   <button name="parse_pcd" string="Parse PCD" type="object" />	
 	                   <button name="parse_dia" string="Parse DIA" type="object" />	
 	                   <button name="parse_et" string="Parse ET" type="object" />	
 	                   <button name="parse_paint" string="Parse Painting" type="object" />	
-	                   <!-- <button name="parse_all_name" string="Parse all name" type="object" />	
 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
 	                   <button name="parse_brand" string="Parse brand" type="object" />	
 	                   <button name="parse_model" string="Parse model" type="object" />	
 	                   <button name="parse_wpd" string="Parse wpd" type="object" />	
 	                   <button name="parse_wsp" string="Parse wsp" type="object" />	
-	                   <button name="parse_studness" string="Parse studness" type="object" />	 -->
 				    </header>
                		<sheet>
-               		    <group col="8" colspan="2">
-	            			<group name="Common data" >
+               		    <group>
+	            			<group name="Common data" colspan="1" >
 	                			<field name="name"/>
 		                		<field name="supplier_id"  />
 		                		<field name="if_etalon"  />
@@ -190,11 +191,17 @@
 			                	<field name="type"/>	
 			                	<field name="country"/>	
 	            			</group>
-	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}">
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="1">
 	                		    <field name="quantity" />
 	                		    <field name="price" />
                     			<field name="default_code"/>
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
+                    			<field name="etalonic_select" />
+	                		    <field name="etalonic_list" nolabel="1" colspan="2" >
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
 	                	    </group>
                 	    </group>
 	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
@@ -298,6 +305,20 @@
             <field name="key">action</field>
             <field name="key2">client_action_multi</field>
             <field name="value" eval="'ir.actions.server,%d'%parse_name_all_server_act"/> 
+       </record>  
+       <record id="parse_name_disk_all_server_act" model="ir.actions.server">
+               <field name="name">Parse selected disks</field>
+                <field name="model_id" ref="model_virt_disk"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.parse_name_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+             
+       <record model="ir.values" id="parse_all_name_disk_ir_values_id">
+            <field name="name"> Parse selected disks act</field>
+            <field name="model">virt.disk</field>
+            <field name="key">action</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.server,%d'%parse_name_disk_all_server_act"/> 
        </record>  
 	</data>
 </openerp>          

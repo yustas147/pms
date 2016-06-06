@@ -396,6 +396,9 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
                         except:
                             if isinstance (cell_value,str) or isinstance (cell_value,unicode):
                                 cell_value = cell_value.replace(',','.')
+                                for sign in ['<','>']:
+                                    if sign in cell_value:
+                                        cell_value = cell_value.replace(sign, '')
                                 cell_value = float(cell_value)
                     if fields_types[fld]=='int':
                         if cell_value:
@@ -406,12 +409,12 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
                 vals.append(cell_value)
                 itr += 1
         except:
-            vals = []
+            #vals = []
             error_rows_list.append(row+1)
-            #logger.error("Cannot import the line #%s", row+1)
+            logger.error("Cannot import the line #%s", row+1)
 
         if any(vals):
-            exist_id = product_pool.search(cr, uid, [('name','=',vals[defcode_pos]),('supplier_id','=',supplier.id)])
+            exist_id = product_pool.search(cr, uid, [('default_code','=',vals[defcode_pos]),('supplier_id','=',supplier.id)])
 #            exist_id = product_pool.search(cr, uid, [('name','=',vals[defcode_pos]),('supplier','=',supplier.id)])
 #            exist_id = product_pool.search(cr, uid, [('default_code','=',vals[defcode_pos]),('supplier','=',supplier.id)])
             if not exist_id:

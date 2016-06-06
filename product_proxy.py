@@ -99,7 +99,31 @@ class virt_disk(models.Model):
     paint = fields.Char('Paint')
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
+    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wksize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire')
+    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
     #tire_model = fields.Many2one('mmodel') 
+    
+    @api.one
+    def _get_etalonic_ids(self):
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
+        self.etalonic_list = et_rset
+    
+    def parse_name_all_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.parse_all_name()
+            print unicode(inst.name)+"         parsed successfully!"
+    
+    @api.multi
+    @api.model
+    def parse_all_name(self):
+        self.parse_brand()
+        self.parse_model()
+        self.parse_wrsize()
+        self.parse_et()
+        self.parse_dia()
+        self.parse_pcd()
+        self.parse_paint()
     
     @api.multi 
     @api.model
@@ -112,6 +136,31 @@ class virt_disk(models.Model):
         else:
             print "########## Painting not found in name: "+ unicode(self.name)
         return True
+    
+    @api.multi 
+    @api.model
+    def parse_brand(self):
+        parser = brandParser(parse_string=self.name, dict_type='disk_brand' )
+        parsed_brand, name_minus_brand = parser.parse()
+        if parsed_brand :
+            self.brand = parsed_brand
+            self.name_unparsed = name_minus_brand
+        else:
+            print "########## Brand not found in name: "+ unicode(self.name)
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_model(self):
+        parser = modelParser(parse_string=self.name, dict_type='disk_model', parent_key=self.brand, parent_key_dict_type='disk_brand')
+        parsed_model, name_minus_model = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_model :
+            self.model = parsed_model
+            self.name_unparsed = name_minus_model
+        else:
+            print "########## model not found in name: "+ unicode(self.name)
+        return True 
     
     @api.multi 
     @api.model
@@ -282,7 +331,7 @@ class virt_tire(models.Model):
     @api.multi 
     @api.model
     def parse_model(self):
-        parser = modelParser(parse_string=self.name, dict_type='tyre_model', parent_key=self.tire_brand)
+        parser = modelParser(parse_string=self.name, dict_type='tyre_model', parent_key=self.tire_brand, parent_key_dict_type='tyre_brand')
         parsed_model, name_minus_model = parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
         if parsed_model :

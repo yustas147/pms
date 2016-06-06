@@ -12,13 +12,10 @@ class Parser(http.Controller):
         ''' result value found by parser '''
         self.res=False
         ''' string before parser worked'''
-        self.parse_string = parse_string
+        self.parse_string = ' '.join(parse_string.split())
+#        self.parse_string = parse_string
         ''' result string after parser worked '''
         self.res_string = False
-       # self.dict_type = dict_type
-       # self.parent_key = parent_key
-#        if dict_type:
-#            self.ddict = self.get_parser_dict(dict_type=dict_type, parent_key=parent_key)
 
     def set_parse_string(self, parse_string):
         self.parse_string = parse_string
@@ -27,36 +24,41 @@ class Parser(http.Controller):
     
     
 #    @route(auth='public')
-    def get_parser_dict(self, dict_type='brand', parent_key=False):
+    def get_parser_dict(self, dict_type='brand', parent_key=False, parent_key_dict_type=False):
+#    def get_parser_dict(self, dict_type='brand', parent_key=False):
          
         key_pool = http.request.env['parse_dict_keys']
         res = {}
          
-        if parent_key:
+        if parent_key and parent_key_dict_type:
             #pkid_set = key_pool.search([('name','=',parent_key)])
-            pkid = key_pool.search([('name','=',parent_key)])[0].id
+            try:
+                pkid = key_pool.search([('name','=',parent_key),('type','=',parent_key_dict_type)])[0].id
 #            print unicode(pkid_set)
 #            pkid = pkid_set[0].id
-            for k in key_pool.search([('type','=',dict_type),('parent_key','=',pkid)]):
-                k_n = k.name
-                res[k_n] = []
-                for v in k.value_ids:
-                    res[k_n].append(v.name)
-                res[k_n].sort(key=len, reverse=True)    
-        else:
+                for k in key_pool.search([('type','=',dict_type),('parent_key','=',pkid)]):
+                    k_n = k.name
+                    res[k_n] = []
+                    for v in k.value_ids:
+                        res[k_n].append(v.name)
+                    res[k_n].sort(key=len, reverse=True)    
+                    self.ddict = res
+                    return res
+            except IndexError:
+                pass
          
-            for k in key_pool.search([('type','=',dict_type)]):
-                k_n = k.name
-                res[k_n] = []
-                for v in k.value_ids:
-                    res[k_n].append(v.name)
-                res[k_n].sort(key=len, reverse=True)
+        for k in key_pool.search([('type','=',dict_type)]):
+            k_n = k.name
+            res[k_n] = []
+            for v in k.value_ids:
+                res[k_n].append(v.name)
+            res[k_n].sort(key=len, reverse=True)
         self.ddict = res
         return res
 
         
 class brandParser(Parser):
-    def __init__(self, parse_string=False, dict_type='tyre_brand', parent_key=False):
+    def __init__(self, parse_string=False, dict_type='tyre_brand', parent_key=False, parent_key_dict_type=False):
         ''' ddict is the dictionary for parsing {key_1:[val11, val12, val1n], key_2:[val21,val22,...,val2m], key_d:[val_d1,...]}
         '''
         ''' Last matched key from ddict for parsed string'''
@@ -64,9 +66,12 @@ class brandParser(Parser):
         self.parse_string = parse_string
         self.dict_type = dict_type
         self.parent_key = parent_key
+        self.parent_key_dict_type = parent_key_dict_type
+
 
     def parse(self):
-        self.get_parser_dict(dict_type=self.dict_type, parent_key=self.parent_key)
+        self.get_parser_dict(dict_type=self.dict_type, parent_key=self.parent_key, parent_key_dict_type=self.parent_key_dict_type)
+#        self.get_parser_dict(dict_type=self.dict_type, parent_key=self.parent_key)
         rres = False
         ''' Prepair string: remove dupl spaces, lowercase all '''
         strtpg = ' '.join(self.parse_string.split()).lower()
@@ -132,56 +137,6 @@ class brandParser(Parser):
             return res           
                     
             
-
-#         def parse_by_val2(psubstr):
-#             res = False
-#             #print strtpg
-#             strtp = strtpg
-#             psubstr = psubstr.lower()
-#             hope = True
-#             psb = psubstr
-#             while hope:
-#                 if psubstr in strtp:
-#                     print unicode(psubstr)+' is found'
-#                     ''' here we need to check if found sequence is a word'''
-#     #                for sign in ['\\', '\/','(',')']:
-#                     psub = ''
-#     #                for sign in ['\\', r'.', r'+',  '/', '(',')']:
-#     #                for sign in [r'+', '\\', '/','(',')']:
-#     #                     if sign in psub:
-#     #                         psub = psub.replace(sign, r'\\'[0:-1]+sign)
-#     #                         print "sign is: "+sign
-#     #                         break
-#                     for smbl in psubstr:
-#                         if smbl in ['\\', r'.', r'+',  '/', '(',')']:
-#                             smbl = smbl.replace(smbl, r'\\'[0:-1]+smbl)
-#                         psub += smbl
-#     #                        psubstr = psubstr.replace(sign, '\\'+unicode(sign))
-#                     psb = psub
-# #                    psubstr = psub
-#                     patt = '(.*)('+psb+')'+'(.*)'
-#                     print unicode(patt)
-#                     rx_compiled = re.compile(patt, re.U | re.I)
-#                     m = rx_compiled.match(strtp)
-#                     if m:
-#                         print unicode(m)
-#                         print '#'+unicode(m.group(1))+'#'
-#                         print '#'+unicode(m.group(2))+'#'
-#                         print '#'+unicode(m.group(3))+'#'
-#                         if (m.group(1) =='' or m.group(1)[-1].isspace() == True) and (m.group(3) == '' or m.group(3)[0].isspace() == True):
-#     #                    if m.group(1) =='' or m.group(1)[-1] == '\t':
-#                             res = ' '.join(strtp.split(psb)) 
-#                             #res = ' '.join(strtp.split(psubstr)) 
-#                             break
-#                         else:
-#                             strtp = strtp.replace(psubstr, '')
-#                             print 'Strtp:'+unicode(strtp)
-#                     else:
-#                         res = False
-#                 else:
-#                     hope = False
-#                 print 'NextWhile!!!'
-#             return res
 
         def parse_by_key(keyp):
             res = False
@@ -280,7 +235,8 @@ class wxrParser(Parser):
             return (matched.group(2)+'x'+matched.group(4)+'__'+ matched.group(1)+' '+matched.group(5)) 
 
         def wxr(cell):
-            re_list = [ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,х,\\]{1})(1\d\s+)(.*)', ur'(.*)(1\d)([\s,x,х,\\])(\d[\./,]?\d?)(\s.*)']
+            re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+#            re_list = [ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
             for regxp in re_list:
                 rx_compiled = re.compile(regxp, re.U)    
 #            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d{1}\s+)(.*)', re.U)    
@@ -296,10 +252,16 @@ class wxrParser(Parser):
         self.res, self.res_string = wxr(self.parse_string)
         return self.res, self.parse_string
     
-#         def wxr(cell):
-#             re_list = list('(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d\s+)(.*)', '(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d\s+)(.*)')
-#             rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d\s+)(.*)', re.U)    
-# #            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d{1}\s+)(.*)', re.U)    
+
+class pcdParser(Parser):
+    def __init__(self, parse_string=False):
+        super(pcdParser,self).__init__(parse_string=parse_string)
+    def parse(self):
+        def wxr_repl(matched):
+            return (matched.group(2)+'x'+matched.group(4)+'__'+ matched.group(1)+' '+matched.group(5)) 
+
+        def wxr(cell):
+#             rx_compiled = re.compile(ur'(.*\s)([3-9]{1})([/\s,x,\\]{1})(\d{2,3}[\.,]?\d?)(.*)', re.U)    
 # #            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
 #             res1 = re.sub(rx_compiled, wxr_repl, cell)
 #             res = res1.split('__')
@@ -311,29 +273,22 @@ class wxrParser(Parser):
 #                     return (['', res[0]])
 #                 else:
 #                     return(['', ''])
-#         self.res, self.res_string = wxr(self.parse_string)
-#         return self.res, self.parse_string
-
-class pcdParser(Parser):
-    def __init__(self, parse_string=False):
-        super(pcdParser,self).__init__(parse_string=parse_string)
-    def parse(self):
-        def wxr_repl(matched):
-            return (matched.group(2)+'x'+matched.group(4)+'__'+ matched.group(1)+' '+matched.group(5)) 
-
-        def wxr(cell):
-            rx_compiled = re.compile(ur'(.*\s)([3-9]{1})([/\s,x,\\]{1})(\d{2,3}[\.,]?\d?)(.*)', re.U)    
-#            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
-            res1 = re.sub(rx_compiled, wxr_repl, cell)
-            res = res1.split('__')
-            if len(res) > 1:
-        #    if len(res) > 0:
-                return res
+        
+            #re_list = [ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+            re_list = [ur'(.*\s)([3-9])([x,х,\\])(\d{3}[\.,]?\d?)(.*)',ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)']
+#            re_list = [ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+            for regxp in re_list:
+                rx_compiled = re.compile(regxp, re.U)    
+                res1 = re.sub(rx_compiled, wxr_repl, cell)
+                res = res1.split('__')
+                if len(res) > 1:
+                    return res
+            if len(res) == 1:
+                return (['', res[0]])
             else:
-                if len(res) == 1:
-                    return (['', res[0]])
-                else:
-                    return(['', ''])
+                return(['', ''])
+        
+        
         self.res, self.res_string = wxr(self.parse_string)
         return self.res, self.parse_string 
 
@@ -345,18 +300,31 @@ class diaParser(Parser):
             return (matched.group(3)+'.'+matched.group(5)+'__'+ matched.group(1)+matched.group(2)+' '+matched.group(6)) 
 
         def wxr(cell):
-            rx_compiled = re.compile(ur'(.*)([\s/]{1})([4-91]\d{1,2})([\.,])(\d)(.*)', re.U)    
-#            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
-            res1 = re.sub(rx_compiled, wxr_repl, cell)
-            res = res1.split('__')
-            if len(res) > 1:
-        #    if len(res) > 0:
-                return res
+#             rx_compiled = re.compile(ur'(.*)([\s/]{1})([4-91]\d{1,2})([\.,])(\d)(.*)', re.U)    
+# #            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
+#             res1 = re.sub(rx_compiled, wxr_repl, cell)
+#             res = res1.split('__')
+#             if len(res) > 1:
+#         #    if len(res) > 0:
+#                 return res
+#             else:
+#                 if len(res) == 1:
+#                     return (['', res[0]])
+#                 else:
+#                     return(['', ''])
+            re_list = [ur'(.*)([\s/]{1})([4-91]\d{1,2})([\.,])(\d)(.*)',ur'(.*)((?:dia|DIA)?)([4-91]\d{1,2})([\.,])(\d)(.*)']
+#            re_list = [ur'(.*)([\s/]{1})([4-91]\d{1,2})([\.,])(\d)(.*)',ur'(.*)(dia|DIA)([4-91]\d{1,2})([\.,])(\d)(.*)']
+            for regxp in re_list:
+                rx_compiled = re.compile(regxp, re.U)    
+                res1 = re.sub(rx_compiled, wxr_repl, cell)
+                res = res1.split('__')
+                if len(res) > 1:
+                    return res
+            if len(res) == 1:
+                return (['', res[0]])
             else:
-                if len(res) == 1:
-                    return (['', res[0]])
-                else:
-                    return(['', ''])
+                return(['', ''])
+
         self.res, self.res_string = wxr(self.parse_string)
         return self.res, self.parse_string  
    
@@ -368,11 +336,9 @@ class etParser(Parser):
             return (matched.group(3)+'__'+ matched.group(1)+' '+ matched.group(2) + ' ' + matched.group(4)) 
 
         def wxr(cell):
-            re_list = [ur'(.*\s)([eEеЕ][tTтТ])\s?(\d\d\d?)(.*)', ur'(.*)(\s)(\d\d\d?)(.*)', ur'(.*)(\d+[.,]?\d)\/(\d\d\d?)\/(\d+[.,]?\d?.*)']
+            re_list = [ur'(.*\s)([eEеЕ][tTтТ])\s?(\d\d\d?)(.*)', ur'(.*)(\s)(\d\d)(.*)',ur'(.*)(\s)([12]\d\d)\s(.*)', ur'(.*)(\d+[.,]?\d)\/(\d\d\d?)\/(\d+[.,]?\d?.*)']
             for regxp in re_list:
                 rx_compiled = re.compile(regxp, re.U)    
-#            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(1\d{1}\s+)(.*)', re.U)    
-#            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
                 res1 = re.sub(rx_compiled, wxr_repl, cell)
                 res = res1.split('__')
                 if len(res) > 1:
