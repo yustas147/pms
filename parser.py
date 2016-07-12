@@ -92,7 +92,7 @@ class brandParser(Parser):
                 if psubstr == 's':
                     print 'SSSSS'
                 if fflag == -1:
-                    break
+                    return False
                 else:
                     if fflag == 0:
                         ''' found in the begining'''
@@ -139,14 +139,22 @@ class brandParser(Parser):
             
 
         def parse_by_key(keyp):
+          #  print unicode(keyp)
             res = False
-            for val in self.ddict[keyp]:
-                res = parse_by_val(val)
-                if res:
-                    ''' Put found key in the parser cache '''
-                    self.cached_key.add(keyp)
-                    return keyp, res
+            if len(self.ddict[keyp]) > 0:
+                for val in self.ddict[keyp]:
+                    res = parse_by_val(val)
+                    if res:
+                        ''' Put found key in the parser cache '''
+                        self.cached_key.add(keyp)
+                        return keyp, res
+            res = parse_by_val(keyp)
+            if res:
+                return keyp, res
+                
             return res
+        
+        
         keylist = self.cached_key
         if len(keylist) > 0:
             keylist.sort(key=len,reverse=True)
@@ -156,7 +164,7 @@ class brandParser(Parser):
                 self.set_res(rres[0])
                 self.set_parse_string(rres[1])
                 return rres
-            else:
+            #else:
                 ''' cache of keys did not work '''
                 ''' perebor vseh keys in ddict except teh, chto in cached_key'''
         keylist = self.ddict.keys()

@@ -170,10 +170,6 @@
 	                   <button name="parse_et" string="Parse ET" type="object" />	
 	                   <button name="parse_paint" string="Parse Painting" type="object" />	
 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
-	                   <button name="parse_brand" string="Parse brand" type="object" />	
-	                   <button name="parse_model" string="Parse model" type="object" />	
-	                   <button name="parse_wpd" string="Parse wpd" type="object" />	
-	                   <button name="parse_wsp" string="Parse wsp" type="object" />	
 				    </header>
                		<sheet>
                		    <group>
