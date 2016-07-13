@@ -42,8 +42,8 @@ class Parser(http.Controller):
                     for v in k.value_ids:
                         res[k_n].append(v.name)
                     res[k_n].sort(key=len, reverse=True)    
-                    self.ddict = res
-                    return res
+                self.ddict = res
+                return res
             except IndexError:
                 pass
          
