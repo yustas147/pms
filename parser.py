@@ -34,8 +34,6 @@ class Parser(http.Controller):
             #pkid_set = key_pool.search([('name','=',parent_key)])
             try:
                 pkid = key_pool.search([('name','=',parent_key),('type','=',parent_key_dict_type)])[0].id
-#            print unicode(pkid_set)
-#            pkid = pkid_set[0].id
                 for k in key_pool.search([('type','=',dict_type),('parent_key','=',pkid)]):
                     k_n = k.name
                     res[k_n] = []
@@ -81,7 +79,6 @@ class brandParser(Parser):
         
         def parse_by_val(psubstr):
             res = False
-            #print strtpg
             strtp = strtpg
             psubstr = psubstr.lower()
             len_psubstr = len(psubstr)
@@ -139,7 +136,6 @@ class brandParser(Parser):
             
 
         def parse_by_key(keyp):
-          #  print unicode(keyp)
             res = False
             if len(self.ddict[keyp]) > 0:
                 for val in self.ddict[keyp]:

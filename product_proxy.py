@@ -5,9 +5,13 @@ from openerp import models, fields, api
 from parser import brandParser, modelParser, wpdParser, wspParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser
 from openerp.osv import osv
 from openerp.tools.translate import _
+import logging
+#codecs
+#import codecs
+#codecs.register(lambda name: codecs.lookup('utf-8') if name == 'cp65001' else None)
 
 
-
+_logger = logging.getLogger('PMS')
 
 class product_proxy(models.Model):
     _name = 'product.proxy'
@@ -33,7 +37,7 @@ class product_proxy(models.Model):
                 return False
         except ValueError:
             return res
-        print res
+        #print res
         return res
             
     
@@ -59,7 +63,7 @@ class product_product(models.Model):
     @api.multi
     @api.model
     def create_proxy(self):
-        print unicode(self.proxy_id)
+        #print unicode(self.proxy_id)
         if not self.virtual_type:
             return {
                     'warning':{
@@ -69,7 +73,7 @@ class product_product(models.Model):
                     }
         if not self.proxy_id:
             rset_proxy = self.env[self.virtual_type].create({'name':self.name, 'if_etalon':True})
-            print unicode(rset_proxy)
+            #print unicode(rset_proxy)
             rset_proxy.ensure_one()
             
             self.proxy_id = rset_proxy[0].proxy_id.id
@@ -112,7 +116,7 @@ class virt_disk(models.Model):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
             inst.parse_all_name()
-            print unicode(inst.name)+"         parsed successfully!"
+            _logger.info(unicode(inst.name)+"         parsed successfully!")
     
     @api.multi
     @api.model
@@ -134,7 +138,7 @@ class virt_disk(models.Model):
             self.paint = parsed_brand
             self.name_unparsed = name_minus_brand
         else:
-            print "########## Painting not found in name: "+ unicode(self.name)
+            _logger.warning( "########## Painting not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -146,7 +150,7 @@ class virt_disk(models.Model):
             self.brand = parsed_brand
             self.name_unparsed = name_minus_brand
         else:
-            print "########## Brand not found in name: "+ unicode(self.name)
+            _logger.warning("########## Brand not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -159,7 +163,7 @@ class virt_disk(models.Model):
             self.model = parsed_model
             self.name_unparsed = name_minus_model
         else:
-            print "########## model not found in name: "+ unicode(self.name)
+            _logger.warning("########## model not found in name: "+ unicode(self.name))
         return True 
     
     @api.multi 
@@ -172,7 +176,7 @@ class virt_disk(models.Model):
             self.wrsize = parsed_wpd.lower()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## wrsize not found in name: "+ unicode(self.name)
+            _logger.warning("########## wrsize not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -184,7 +188,7 @@ class virt_disk(models.Model):
             self.pcd = parsed_wpd.lower()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## pcd not found in name: "+ unicode(self.name)
+            _logger.warning( "########## pcd not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -196,7 +200,7 @@ class virt_disk(models.Model):
             self.dia = parsed_wpd.lower()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## dia not found in name: "+ unicode(self.name)
+            _logger.warning("########## dia not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -208,7 +212,7 @@ class virt_disk(models.Model):
             self.et = parsed_wpd.lower()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## dia not found in name: "+ unicode(self.name)
+            _logger.warning( "########## dia not found in name: "+ unicode(self.name))
         return True
 
 
@@ -238,7 +242,7 @@ class virt_tire(models.Model):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
             inst.parse_all_name()
-            print unicode(inst.name)+"         parsed successfully!"
+            _logger.info( unicode(inst.name)+"         parsed successfully!")
     
     @api.multi
     @api.model
@@ -297,7 +301,7 @@ class virt_tire(models.Model):
             self.tire_brand = parsed_brand
             self.name_unparsed = name_minus_brand
         else:
-            print "########## brand not found in name: "+ unicode(self.name)
+            _logger.warning( "########## brand not found in name: "+ unicode(self.name))
         return True
     
     @api.multi 
@@ -310,7 +314,7 @@ class virt_tire(models.Model):
             self.tire_studness = parsed_brand
             self.name_unparsed = name_minus_brand
         else:
-            print "########## studness not found in name: "+ unicode(self.name)
+            _logger.warning( "########## studness not found in name: "+ unicode(self.name))
             self.tire_studness = 'n/s'
         return True
     
@@ -338,7 +342,7 @@ class virt_tire(models.Model):
             self.tire_model = parsed_model
             self.name_unparsed = name_minus_model
         else:
-            print "########## model not found in name: "+ unicode(self.name)
+            _logger.warning( "########## model not found in name: "+ unicode(self.name))
         return True 
     
     @api.multi 
@@ -351,7 +355,7 @@ class virt_tire(models.Model):
             self.tire_wpd = parsed_wpd.upper()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## wpd not found in name: "+ unicode(self.name)
+            _logger.warning("########## wpd not found in name: "+ unicode(self.name))
         return True
 
     @api.multi 
@@ -364,6 +368,6 @@ class virt_tire(models.Model):
             self.tire_wsp = parsed_wpd.upper()
             self.name_unparsed = name_minus_wpd
         else:
-            print "########## wsp not found in name: "+ unicode(self.name)
+            _logger.warning( "########## wsp not found in name: "+ unicode(self.name))
         return True
 
