@@ -59,6 +59,11 @@
             <field name="inherit_id" ref="product.product_normal_form_view" />
             <field name="type">form</field>
             <field name="arch" type="xml">
+                <xpath expr="//sheet" position="before">
+                    <header>
+                		    <button name='open_virt' type='object' string='Open virtual product'/>
+                    </header>
+                </xpath>
                 <xpath expr="//notebook" position="inside">
                 	<page string="PMS">
                 		<group colspan="4">
@@ -66,6 +71,7 @@
                 			<field name="proxy_id"/>
                 		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
                 		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
+                		    <button name='update_magento_price' type='object' string='upd mag price' />
                 		</group>
                 			<field name="proxy_ids">
                 			    <tree>
@@ -162,14 +168,17 @@
               	<form>
               	    <header>
 	                   <button name="parse_all_name" string="Parse all name" type="object" />	
-	                   <button name="parse_brand" string="Parse brand" type="object" />	
-	                   <button name="parse_model" string="Parse model" type="object" />	
-	                   <button name="parse_wrsize" string="Parse WRSize" type="object" />	
-	                   <button name="parse_pcd" string="Parse PCD" type="object" />	
-	                   <button name="parse_dia" string="Parse DIA" type="object" />	
-	                   <button name="parse_et" string="Parse ET" type="object" />	
-	                   <button name="parse_paint" string="Parse Painting" type="object" />	
-	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
+	                   <button name="parse_brand" string="Parse brand" type="object" attrs="{'invisible':[('brand', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_model" string="Parse model" type="object" attrs="{'invisible':[('model', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_wrsize" string="Parse WRSize" type="object" attrs="{'invisible':[('wrsize', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_pcd" string="Parse PCD" type="object" attrs="{'invisible':[('pcd', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_dia" string="Parse DIA" type="object" attrs="{'invisible':[('dia', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_et" string="Parse ET" type="object" attrs="{'invisible':[('et', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_paint" string="Parse Painting" type="object" attrs="{'invisible':[('paint', '!=', False)]}" class="oe_highlight"/>	
+<!-- 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	 -->
+	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('etalon_id', '!=', False)]}"/>	
+	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
+	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>	
 				    </header>
                		<sheet>
                		    <group>
@@ -294,6 +303,12 @@
                <field name="state">code</field>
                <field name="code">action = self.parse_name_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
+           <record id="upd_list_price_sel_products_server_act" model="ir.actions.server">
+               <field name="name">Update price for selected products</field>
+                <field name="model_id" ref="model_product_product"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.upd_prod_price_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
              
        <record model="ir.values" id="parse_all_name_ir_values_id">
             <field name="name"> Name of server act</field>
@@ -307,6 +322,18 @@
                 <field name="model_id" ref="model_virt_disk"/> 
                <field name="state">code</field>
                <field name="code">action = self.parse_name_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+       <record id="create_proxy_tires_server_act" model="ir.actions.server">
+               <field name="name">Mark selected as TIRE and create proxies</field>
+                <field name="model_id" ref="model_product_product"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.create_proxy_tires_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+       <record id="create_proxy_disks_server_act" model="ir.actions.server">
+               <field name="name">Mark selected as DISK and create proxies</field>
+                <field name="model_id" ref="model_product_product"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.create_proxy_tires_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
              
        <record model="ir.values" id="parse_all_name_disk_ir_values_id">

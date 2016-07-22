@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api
+from openerp import models, fields, api, http
 #import parser
 from parser import brandParser, modelParser, wpdParser, wspParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser
 from openerp.osv import osv
 from openerp.tools.translate import _
 import logging
+#from openerp.test.magentoerpconnect_pricing.product import product_price_changed
+
 #codecs
 #import codecs
 #codecs.register(lambda name: codecs.lookup('utf-8') if name == 'cp65001' else None)
@@ -39,6 +41,10 @@ class product_proxy(models.Model):
             return res
         #print res
         return res
+
+    @api.one
+    def disconnect_etalon(self):
+        self.etalon_id = False
             
     
 class product_product(models.Model):
@@ -50,6 +56,26 @@ class product_product(models.Model):
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
     #proxy_ids = fields.One2many()
     
+    
+    @api.multi
+    @api.model
+    def update_magento_price(self):
+        #self.list_price = self.standard_price
+        pr_list = self.pricelist_id
+        res = pr_list.price_get(self.id, 1)
+        _logger.info("RESULT is: "+unicode(res))
+        self.list_price = res.values()[0]
+        
+    def upd_prod_price_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.update_magento_price()
+            _logger.info(unicode(inst.name)+"         price updated!")
+        
+
+        
+#    def set_list_price_new(self, cr, uid, ids, context):
+
     
     @api.multi
     @api.model
@@ -78,6 +104,53 @@ class product_product(models.Model):
             
             self.proxy_id = rset_proxy[0].proxy_id.id
     
+    @api.multi
+    @api.model
+    def create_proxy_type(self, product_type=None):
+        if self.virtual_type and product_type:
+            _logger.warning("Changing product type from "+unicode(self.virtual_type)+"to "+unicode(product_type))
+        self.virtual_type = product_type
+        self.create_proxy()
+        
+        
+    def create_proxy_tires_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.create_proxy_type(product_type="virt.tire")
+            _logger.info(unicode(inst.name)+"         proxy created!")
+
+    def create_proxy_disks_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.create_proxy_type(product_type="virt.disk")
+            _logger.info(unicode(inst.name)+"         proxy created!")
+            
+    @api.multi
+    @api.model
+    def get_virt_id(self, virt_model):
+        virt_pool = http.request.env[virt_model]
+        return virt_pool.search([('proxy_id','=',self.proxy_id.id)])[0].id
+        
+    
+    @api.multi
+    @api.model
+    def open_virt(self):
+    #Define model name of agreement:
+        mod_name=self.virtual_type
+        #print mod_name
+        return {
+        'type': 'ir.actions.act_window',
+        'view_type': 'form',
+        'view_mode': 'form',
+        'res_model': mod_name,
+        'res_id': self.get_virt_id(mod_name),
+        "views": [[False, "form"]],
+        }
+            
+            
+        
+    
+    
 class mBrand(models.Model):
 
     _name = 'mbrand'
@@ -103,7 +176,7 @@ class virt_disk(models.Model):
     paint = fields.Char('Paint')
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
-    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wksize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire')
+    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
     #tire_model = fields.Many2one('mmodel') 
     
@@ -112,11 +185,28 @@ class virt_disk(models.Model):
         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
         self.etalonic_list = et_rset
     
+    @api.one
+    def autoconnect(self):
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
+        if len(et_rset):
+            self.etalonic_select = et_rset[0].id
+            self.etalon_id = et_rset[0].proxy_id.id
+        
+    
     def parse_name_all_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
             inst.parse_all_name()
             _logger.info(unicode(inst.name)+"         parsed successfully!")
+    
+    @api.one
+    def clear_parsed_fields(self):
+        self.write({'brand':False,'model':False,'wrsize':False,'pcd':False,'et':False,'dia':False,'paint':False,'country':False})
+
+    @api.one
+    def disconnect_etalon(self):
+        self.write({'etalon_id':False})
+
     
     @api.multi
     @api.model
