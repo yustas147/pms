@@ -82,7 +82,8 @@ class product_product(models.Model):
     def set_lowest_lst_price(self):
        newprice = self.proxy_id.get_lower_price() 
        if newprice:
-           self.lst_price = newprice
+           self.standard_price = newprice
+#           self.lst_price = newprice
         
         
         
@@ -91,18 +92,20 @@ class product_product(models.Model):
     def create_proxy(self):
         #print unicode(self.proxy_id)
         if not self.virtual_type:
-            return {
-                    'warning':{
-                               'title': _("Achtung!!!!"),
-                               'message': _("Virtual type must be selected!!!")
-                               }
-                    }
+            return False
+#             return {
+#                     'warning':{
+#                                'title': _("Achtung!!!!"),
+#                                'message': _("Virtual type must be selected!!!")
+#                                }
+#                     }
         if not self.proxy_id:
             rset_proxy = self.env[self.virtual_type].create({'name':self.name, 'if_etalon':True})
             #print unicode(rset_proxy)
             rset_proxy.ensure_one()
             
             self.proxy_id = rset_proxy[0].proxy_id.id
+            return self.proxy_id
     
     @api.multi
     @api.model
@@ -110,7 +113,7 @@ class product_product(models.Model):
         if self.virtual_type and product_type:
             _logger.warning("Changing product type from "+unicode(self.virtual_type)+"to "+unicode(product_type))
         self.virtual_type = product_type
-        self.create_proxy()
+        return self.create_proxy()
         
         
     def create_proxy_tires_sel_ids(self, cr, uid, ids, context=False):
@@ -124,6 +127,29 @@ class product_product(models.Model):
             inst = self.browse(cr, uid, [instid])[0]
             inst.create_proxy_type(product_type="virt.disk")
             _logger.info(unicode(inst.name)+"         proxy created!")
+
+    def create_proxy_disks_and_parse_sel_ids(self, cr, uid, ids, context=False):
+        pool = self.pool.get('virt.disk')
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst_prx = inst.create_proxy_type(product_type="virt.disk")
+            if inst_prx:
+                v_id = pool.search(cr, uid, [('proxy_id','=',inst_prx.id)])[0]
+                inst_virt = pool.browse(cr, uid, [v_id])
+                inst_virt.parse_all_name()
+            _logger.info(unicode(inst.name)+"         proxy created and parsed!")
+            
+    def create_proxy_and_parse_sel_ids(self, cr, uid, ids, virt_type='VIRT_TYPE_MUST_BE_SET', context=False):
+        pool = self.pool.get(virt_type)
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst_prx = inst.create_proxy_type(product_type=virt_type)
+            if inst_prx:
+                v_id = pool.search(cr, uid, [('proxy_id','=',inst_prx.id)])[0]
+                inst_virt = pool.browse(cr, uid, [v_id])
+                inst_virt.parse_all_name()
+            _logger.info(unicode(inst.name)+"         proxy created and parsed!")
+    
             
     @api.multi
     @api.model
@@ -177,17 +203,37 @@ class virt_disk(models.Model):
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
     etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire')
+    reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
+    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
     #tire_model = fields.Many2one('mmodel') 
+    
+    @api.multi
+    @api.model
+    def conn_to_me(self):
+        if self.reverse_etalonic_select == False:
+            return False
+        n_inst = self.browse([self.reverse_etalonic_select.id])
+        _logger.info('self is:  '+unicode(self))
+        _logger.info('n_inst is:  '+unicode(n_inst))
+        n_inst.write({'etalon_id':self.proxy_id.id})
     
     @api.one
     def _get_etalonic_ids(self):
-        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
         self.etalonic_list = et_rset
+
+    @api.one
+    def _get_reverse_etalonic_ids(self):
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
+        self.reverse_etalonic_list = et_rset
     
     @api.one
     def autoconnect(self):
-        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),
+                               ('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
         if len(et_rset):
             self.etalonic_select = et_rset[0].id
             self.etalon_id = et_rset[0].proxy_id.id
@@ -317,16 +363,54 @@ class virt_tire(models.Model):
     tire_wsp = fields.Char('Speed idx')
     tire_wpd = fields.Char('Dimensions')
     tire_studness = fields.Selection([('n/s','Non-studded'),('studded','Studded'),('studdable','Studdable')],string='Studness')
+    country = fields.Char('Country')
     name_unparsed = fields.Char('Left for parsing')
     etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',True)]", string = 'Select etalonic tire')
+    reverse_etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',False)]", string = 'Select non-etalon tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
+    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.tire', string = 'Possible non-etalon virt tires')
 #    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
 
+
+    @api.one
+    def autoconnect(self):
+        et_rset = self.search([('tire_wsp', '=', self.tire_wsp), ('tire_wpd', '=', self.tire_wpd), ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
+                               ('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
+        if len(et_rset):
+            self.etalonic_select = et_rset[0].id
+            self.etalon_id = et_rset[0].proxy_id.id
+
+    @api.multi
+    @api.model
+    def conn_to_me(self):
+        if self.reverse_etalonic_select == False:
+            return False
+        n_inst = self.browse([self.reverse_etalonic_select.id])
+        _logger.info('self is:  '+unicode(self))
+        _logger.info('n_inst is:  '+unicode(n_inst))
+        n_inst.write({'etalon_id':self.proxy_id.id})
+
+    @api.one
+    def clear_parsed_fields(self):
+        self.write({'tire_brand':False,'tire_model':False,'tire_wpd':False,'tire_wsp':False,'tire_studness':False,'country':False})
+
+    @api.one
+    def disconnect_etalon(self):
+        self.write({'etalon_id':False})
     
     @api.one
     def _get_etalonic_ids(self):
-        et_rset = self.search([('tire_wpd', '=', self.tire_wpd), ('tire_wsp', '=', self.tire_wsp), ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
+        et_rset = self.search([('tire_wpd', '=', self.tire_wpd), ('tire_wsp', '=', self.tire_wsp), 
+                               ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
+                               ('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
         self.etalonic_list = et_rset
+    @api.one
+
+    def _get_reverse_etalonic_ids(self):
+        et_rset = self.search([('tire_wpd', '=', self.tire_wpd), ('tire_wsp', '=', self.tire_wsp),
+                                ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
+                                ('tire_studness','=',self.tire_studness),('if_etalon', '=', False)])
+        self.reverse_etalonic_list = et_rset
     
     def parse_name_all_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:

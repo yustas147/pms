@@ -96,11 +96,16 @@
               	    <header>
 	                   <button name="parse_all_name" string="Parse all name" type="object" />	
 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	
-	                   <button name="parse_brand" string="Parse brand" type="object" />	
-	                   <button name="parse_model" string="Parse model" type="object" />	
-	                   <button name="parse_wpd" string="Parse wpd" type="object" />	
-	                   <button name="parse_wsp" string="Parse wsp" type="object" />	
-	                   <button name="parse_studness" string="Parse studness" type="object" />	
+	                   <button name="parse_brand" string="Parse brand" type="object" attrs="{'invisible':[('tire_brand', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_model" string="Parse model" type="object" attrs="{'invisible':[('tire_model', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_wpd" string="Parse wpd" type="object" attrs="{'invisible':[('tire_wpd', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_wsp" string="Parse wsp" type="object" attrs="{'invisible':[('tire_wsp', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_studness" string="Parse studness" type="object" attrs="{'invisible':[('tire_studness', '!=', False)]}" class="oe_highlight"/>	
+	                   
+	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('if_etalon', '=', True)]}"/>	
+	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
+	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
+	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>
 				    </header>
                		<sheet>
                		    <group>
@@ -114,18 +119,25 @@
 			                	<field name="tire_wpd"/>	
 			                	<field name="tire_studness"/>	
 	            			</group>
-	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="1">
-	                		    <field name="quantity" />
-	                		    <field name="price" />
-                     			<field name="default_code"/>
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
-	                		    <field name="etalonic_select" />
-	                		    <field name="etalonic_list" nolabel="1" colspan="2" >
+	            			<group name="Supplier`s data" colspan="1">
+	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+                     			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+	                		    <label string="Possible etalons" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', True)]}">
 	                		    	<tree>
 	                		    	    <field name="name" />
 	                		    	</tree>
 	                		    </field>
-	                		    
+	                		    <label string="Possible non-etalons" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+	                		    <field name="reverse_etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', False)]}" >
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
 	                	    </group>	
                 	    </group>
 	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
@@ -176,7 +188,8 @@
 	                   <button name="parse_et" string="Parse ET" type="object" attrs="{'invisible':[('et', '!=', False)]}" class="oe_highlight"/>	
 	                   <button name="parse_paint" string="Parse Painting" type="object" attrs="{'invisible':[('paint', '!=', False)]}" class="oe_highlight"/>	
 <!-- 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	 -->
-	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('etalon_id', '!=', False)]}"/>	
+	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('if_etalon', '=', True)]}"/>	
+	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>	
 				    </header>
@@ -196,13 +209,21 @@
 			                	<field name="type"/>	
 			                	<field name="country"/>	
 	            			</group>
-	            			<group name="Supplier`s data" attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="1">
-	                		    <field name="quantity" />
-	                		    <field name="price" />
-                    			<field name="default_code"/>
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  />
-                    			<field name="etalonic_select" />
-	                		    <field name="etalonic_list" nolabel="1" colspan="2" >
+	            			<group name="Specific data"  colspan="1">
+	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+                    			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+                    			<field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+                    			<field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/> 
+                    			<label string="Possible etalons" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', True)]}">
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
+                    			<label string="Possible non-etalons" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+	                		    <field name="reverse_etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', False)]}" >
 	                		    	<tree>
 	                		    	    <field name="name" />
 	                		    	</tree>
@@ -333,7 +354,19 @@
                <field name="name">Mark selected as DISK and create proxies</field>
                 <field name="model_id" ref="model_product_product"/> 
                <field name="state">code</field>
-               <field name="code">action = self.create_proxy_tires_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+               <field name="code">action = self.create_proxy_disks_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+        <record id="create_proxy_disks_and_parse_server_act" model="ir.actions.server">
+               <field name="name">Mark selected as DISK, create proxies and parse them.</field>
+                <field name="model_id" ref="model_product_product"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.create_proxy_and_parse_sel_ids(cr, uid, context.get('active_ids',[]), virt_type='virt.disk',context=context)</field>
+        </record>
+        <record id="create_proxy_tires_and_parse_server_act" model="ir.actions.server">
+               <field name="name">Mark selected as TIRE, create proxies and parse them.</field>
+                <field name="model_id" ref="model_product_product"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.create_proxy_and_parse_sel_ids(cr, uid, context.get('active_ids',[]), virt_type='virt.tire',context=context)</field>
         </record>
              
        <record model="ir.values" id="parse_all_name_disk_ir_values_id">
