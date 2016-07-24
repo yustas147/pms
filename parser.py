@@ -3,7 +3,7 @@
 from openerp import models, fields, api, http
 import re
 
-
+#changes symb_a by symb_b in string
 def ch_symb(strng, symb_a, symb_b):
     if symb_a in strng:
         lst = list(strng)
@@ -15,6 +15,11 @@ def ch_symb(strng, symb_a, symb_b):
 
 dp = lambda strng: ch_symb(strng, ',', '.')
 
+#changes string on string with prefix
+def prefstr(strng, pref):
+    return unicode(pref)+unicode(strng)
+
+prf = lambda strng: prefstr(strng, '### ')
 
 class Parser(http.Controller):
 #class Parser(object):
@@ -201,7 +206,8 @@ class wpdParser(Parser):
             return (matched.group(2)+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
 
         def wpd(cell):
-            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/](\d\d[RF|C]*)(.*)', re.U)    
+            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)', re.U)    
+#            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/](\d\d[RF|C]*)(.*)', re.U)    
 #            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[R/](\d\d[RF|C]*)(.*)', re.U)    
             res1 = re.sub(rx_compiled, wpd_repl, cell)
             res = res1.split('__')
@@ -246,7 +252,8 @@ class wspParser(wpdParser):
             
 class wxrParser(Parser):
     def __init__(self, parse_string=False):
-        super(wxrParser,self).__init__(parse_string=parse_string)
+        super(wxrParser,self).__init__(parse_string=prf(parse_string))
+#        super(wxrParser,self).__init__(parse_string=parse_string)
     def parse(self):
         def wxr_repl(matched):
             mg2 = float(dp(matched.group(2)))
