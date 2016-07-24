@@ -54,8 +54,20 @@ class product_product(models.Model):
     proxy_id = fields.Many2one('product.proxy', domain="[('if_etalon', '=', True)]")
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
-    #proxy_ids = fields.One2many()
+    virt_stock = fields.Integer(string='Virtual stock quantity', compute='_set_virtual_stock')
+
     
+    @api.multi
+    @api.model
+    def _set_virtual_stock(self):
+        _logger.info('proxy_ids are: '+unicode(self.proxy_ids))
+        res = 0
+        for prx in self.proxy_ids:
+            res += prx.quantity
+        _logger.info('virtual stock is : '+unicode(res))
+        self.virt_stock = res
+        return res
+
     
     @api.multi
     @api.model

@@ -3,6 +3,19 @@
 from openerp import models, fields, api, http
 import re
 
+
+def ch_symb(strng, symb_a, symb_b):
+    if symb_a in strng:
+        lst = list(strng)
+        pos = lst.index(symb_a)
+        res = lst[:pos]+list(symb_b)+lst[pos+1:]
+        res = ''.join(res)
+        return res
+    return strng
+
+dp = lambda strng: ch_symb(strng, ',', '.')
+
+
 class Parser(http.Controller):
 #class Parser(object):
 
@@ -236,10 +249,18 @@ class wxrParser(Parser):
         super(wxrParser,self).__init__(parse_string=parse_string)
     def parse(self):
         def wxr_repl(matched):
-            return (matched.group(2)+'x'+matched.group(4)+'__'+ matched.group(1)+' '+matched.group(5)) 
+            mg2 = float(dp(matched.group(2)))
+#            mg2 = float(ch_symb(matched.group(2),',','.'))
+            mg4 = float(dp(matched.group(4)))
+#            mg4 = float(ch_symb(matched.group(4),',','.'))
+            if mg2 > mg4:
+                return (dp(matched.group(4))+'x'+dp(matched.group(2))+'__'+ matched.group(1)+' '+matched.group(5)) 
+            return (dp(matched.group(2))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
 
         def wxr(cell):
-            re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+##            re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+            re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)', 
+                       ur'(.*\s)([1-2]\d)([x,х])(\d[\.,][0,5])(.*)',ur'(.*\s)([1-2]\d)([x,х])(\d)(.*)']
 #            re_list = [ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
             for regxp in re_list:
                 rx_compiled = re.compile(regxp, re.U)    
