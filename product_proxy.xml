@@ -230,6 +230,7 @@
 	                		    	    <field name="name" />
 	                		    	</tree>
 	                		    </field>
+	                		    <field name="etalonic_list_domain"/>
 	                	    </group>
                 	    </group>
 	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
