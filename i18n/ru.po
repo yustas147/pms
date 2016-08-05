@@ -1,0 +1,855 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* product_proxy
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 8.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-08-01 06:28+0000\n"
+"PO-Revision-Date: 2016-08-01 11:36+0200\n"
+"Last-Translator: Yury Stasovsky <yustas@simbioz.com.ua>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+
+#. module: product_proxy
+#: model:ir.actions.act_window,name:product_proxy.action_imp_show_instances
+#: model:ir.ui.menu,name:product_proxy.imp_instances_menu
+msgid "... import"
+msgstr "... импорт"
+
+#. module: product_proxy
+#: selection:virt.disk,type:0
+msgid "4x4"
+msgstr ""
+
+#. module: product_proxy
+#: selection:product.product,virtual_type:0
+msgid "AutoDisk"
+msgstr "АвтоДиск"
+
+#. module: product_proxy
+#: selection:product.product,virtual_type:0
+msgid "AutoTire"
+msgstr "АвтоШина"
+
+#. module: product_proxy
+#: field:virt.disk,proxy_id:0
+#: field:virt.tire,proxy_id:0
+msgid "Automatically created field to link to parent product.proxy"
+msgstr "Поле связи с родительским прокси"
+
+#. module: product_proxy
+#: field:mbrand,name:0
+#: field:mmodel,name:0
+#: field:virt.disk,brand:0
+#: field:virt.tire,tire_brand:0
+msgid "Brand"
+msgstr "Бренд"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: view:imp.imp:product_proxy.view_imp_tree
+msgid "Browse"
+msgstr "Открыть"
+
+#. module: product_proxy
+#: selection:imp.imp,imp_type:0
+msgid "CSV"
+msgstr ""
+
+#. module: product_proxy
+#: field:imp.imp,category_id:0
+msgid "Category"
+msgstr "Категория"
+
+#. module: product_proxy
+#: field:imp.config,data_type:0
+msgid "Choose the data model type: tyre, disk, etc."
+msgstr "Выберите тип данных: шина, диск, др."
+
+#. module: product_proxy
+#: field:product.proxy,default_code:0
+msgid "Code in pricelist"
+msgstr "Код в прайслисте"
+
+#. module: product_proxy
+#: view:product.proxy:product_proxy.product_proxy_form
+msgid "Common data"
+msgstr "Общие данные"
+
+#. module: product_proxy
+#: field:virt.disk,country:0
+#: field:virt.tire,country:0
+msgid "Country"
+msgstr "Страна"
+
+#. module: product_proxy
+#: view:product.product:product_proxy.product_product_proxy_form_inh
+msgid "Create proxy"
+msgstr "Создать прокси"
+
+#. module: product_proxy
+#: field:imp.config,create_uid:0
+#: field:imp.imp,create_uid:0
+#: field:mbrand,create_uid:0
+#: field:mmodel,create_uid:0
+#: field:parse_dict_keys,create_uid:0
+#: field:parse_dict_vals,create_uid:0
+#: field:product.proxy,create_uid:0
+#: field:virt.disk,create_uid:0
+#: field:virt.tire,create_uid:0
+msgid "Created by"
+msgstr "Кем создано"
+
+#. module: product_proxy
+#: field:imp.config,create_date:0
+#: field:imp.imp,create_date:0
+#: field:mbrand,create_date:0
+#: field:mmodel,create_date:0
+#: field:parse_dict_keys,create_date:0
+#: field:parse_dict_vals,create_date:0
+#: field:product.proxy,create_date:0
+#: field:virt.disk,create_date:0
+#: field:virt.tire,create_date:0
+msgid "Created on"
+msgstr "Когда создано"
+
+#. module: product_proxy
+#: field:virt.disk,dia:0
+msgid "DIA"
+msgstr "Диам. центров. отв."
+
+#. module: product_proxy
+#: field:parse_dict_vals,name:0
+msgid "Dict values for parsing"
+msgstr "Значения словаря парсинга"
+
+#. module: product_proxy
+#: field:virt.tire,tire_wpd:0
+msgid "Dimensions"
+msgstr "Размеры"
+
+#. module: product_proxy
+#: field:virt.disk,et:0
+msgid "ET"
+msgstr "Вылет диска"
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.imp_main_menu
+msgid "Easy Import"
+msgstr "Импорт прайсов"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,etalon_catalog:0
+msgid "Etalon catalog"
+msgstr "Эталонный каталог"
+
+#. module: product_proxy
+#: field:product.proxy,etalon_id:0
+msgid "Etalon product"
+msgstr "Эталонный продукт"
+
+#. module: product_proxy
+#: field:virt.disk,etalonic_list_domain:0
+msgid "Etalonic list domain"
+msgstr "Фильтр списка эталонов"
+
+#. module: product_proxy
+#: view:parse_dict_keys:product_proxy.parse_dict_keys
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Export dict data for parser"
+msgstr ""
+
+#. module: product_proxy
+#: field:imp.imp,fields_order:0
+msgid "Fields order"
+msgstr "Порядок полей"
+
+#. module: product_proxy
+#: field:imp.config,import_fields_types:0
+msgid "Fields types"
+msgstr "Типы полей"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,loc:0
+msgid "File"
+msgstr "Файл"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,force_import:0
+msgid "Force import"
+msgstr "Принудительный импорт"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "General"
+msgstr "Общие"
+
+#. module: product_proxy
+#: view:product.proxy:product_proxy.product_proxy_form
+msgid "Get lower price"
+msgstr "Выставить наименьшую цену"
+
+#. module: product_proxy
+#: field:imp.imp,hide_unused:0
+msgid "Hide unused fields"
+msgstr "Спрятать неиспользуемые поля"
+
+#. module: product_proxy
+#: field:imp.config,id:0
+#: field:imp.imp,id:0
+#: field:mbrand,id:0
+#: field:mmodel,id:0
+#: field:parse_dict_keys,id:0
+#: field:parse_dict_vals,id:0
+#: field:product.proxy,id:0
+#: field:virt.disk,id:0
+#: field:virt.tire,id:0
+msgid "ID"
+msgstr ""
+
+#. module: product_proxy
+#: view:imp.config:product_proxy.view_imp_config_form
+msgid "Imp config data xml"
+msgstr "Конфигуратор импорта"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Import"
+msgstr "Импорт"
+
+#. module: product_proxy
+#: model:ir.actions.act_window,name:product_proxy.action_imp_config
+#: model:ir.ui.menu,name:product_proxy.imp_config
+msgid "Import config"
+msgstr "Конфигуратор..."
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.imp_config_new
+msgid "Import config NEW"
+msgstr "... полей"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_tree
+msgid "Import tree view"
+msgstr ""
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,description:0
+msgid "Information"
+msgstr "Информация"
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.imp_instances
+msgid "Instance ..."
+msgstr "Отдельный ..."
+
+#. module: product_proxy
+#: field:product.proxy,if_etalon:0
+msgid "Is it etalon?"
+msgstr "Это эталон?"
+
+#. module: product_proxy
+#: field:parse_dict_vals,parse_key_id:0
+msgid "Key"
+msgstr "Ключ"
+
+#. module: product_proxy
+#: field:parse_dict_keys,name:0
+msgid "Keys for parsing"
+msgstr "Ключи парсера"
+
+#. module: product_proxy
+#: field:imp.imp,last_import:0
+msgid "Last Import Time"
+msgstr "Время последнего импорта"
+
+#. module: product_proxy
+#: field:imp.config,write_uid:0
+#: field:imp.imp,write_uid:0
+#: field:mbrand,write_uid:0
+#: field:mmodel,write_uid:0
+#: field:parse_dict_keys,write_uid:0
+#: field:parse_dict_vals,write_uid:0
+#: field:product.proxy,write_uid:0
+#: field:virt.disk,write_uid:0
+#: field:virt.tire,write_uid:0
+msgid "Last Updated by"
+msgstr "Последнее обновление:"
+
+#. module: product_proxy
+#: field:imp.config,write_date:0
+#: field:imp.imp,write_date:0
+#: field:mbrand,write_date:0
+#: field:mmodel,write_date:0
+#: field:parse_dict_keys,write_date:0
+#: field:parse_dict_vals,write_date:0
+#: field:product.proxy,write_date:0
+#: field:virt.disk,write_date:0
+#: field:virt.tire,write_date:0
+msgid "Last Updated on"
+msgstr "Последнее обновление:"
+
+#. module: product_proxy
+#: field:virt.tire,name_unparsed:0
+msgid "Left for parsing"
+msgstr "Осталось отпарсить"
+
+#. module: product_proxy
+#: selection:virt.disk,type:0
+msgid "Legkovantazhny"
+msgstr "Легкогрузовой"
+
+#. module: product_proxy
+#: selection:virt.disk,type:0
+msgid "Legkovy"
+msgstr "Легковой"
+
+#. module: product_proxy
+#: selection:imp.imp,imp_file:0
+msgid "Local"
+msgstr "Локальн."
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Location of File"
+msgstr "Расположение файла"
+
+#. module: product_proxy
+#: field:imp.imp,imp_file:0
+msgid "Location of file"
+msgstr "Расположение файла"
+
+#. module: product_proxy
+#: field:imp.imp,md5:0
+msgid "MD5"
+msgstr ""
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.create_proxy_disks_server_act
+msgid "Mark selected as DISK and create proxies"
+msgstr "Отметить выбранные записи как АвтоДиск и создать прокси"
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.create_proxy_disks_and_parse_server_act
+msgid "Mark selected as DISK, create proxies and parse them."
+msgstr "Отметить выбранные записи как АвтоДиск, создать прокси и отпарсить"
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.create_proxy_tires_server_act
+msgid "Mark selected as TIRE and create proxies"
+msgstr "Отметить выбранные записи как АвтоШина, создать прокси"
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.create_proxy_tires_and_parse_server_act
+msgid "Mark selected as TIRE, create proxies and parse them."
+msgstr "Отметить выбранные записи как АвтоШина, создать прокси и отпарсить"
+
+#. module: product_proxy
+#: field:virt.disk,model:0
+#: field:virt.tire,tire_model:0
+msgid "Model"
+msgstr "Модель"
+
+#. module: product_proxy
+#: field:imp.config,name:0
+#: field:product.proxy,name:0
+msgid "Name"
+msgstr "Название"
+
+#. module: product_proxy
+#: selection:virt.tire,tire_studness:0
+msgid "Non-studded"
+msgstr "Нешипованн."
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,notes:0
+msgid "Notes"
+msgstr "Заметки"
+
+#. module: product_proxy
+#: field:imp.imp,line_start:0
+msgid "Number of line the data begins from"
+msgstr "Номер первой строки данных"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Numbers of sheet and line"
+msgstr "Номера страницы и первой строки данных"
+
+#. module: product_proxy
+#: view:product.product:product_proxy.product_product_proxy_form_inh
+msgid "Open virtual product"
+msgstr "Открыть виртуальный продукт"
+
+#. module: product_proxy
+#: field:imp.imp,import_order:0
+msgid "Order of fields"
+msgstr "Порядок полей"
+
+#. module: product_proxy
+#: field:imp.imp,import_order_main:0
+msgid "Order of fields (main)"
+msgstr "Порядок полей (главн.)"
+
+#. module: product_proxy
+#: field:virt.disk,pcd:0
+msgid "PCD"
+msgstr "Посад. болты и диам. "
+
+#. module: product_proxy
+#: view:product.product:product_proxy.product_product_proxy_form_inh
+msgid "PMS"
+msgstr "Система управления прайсами"
+
+#. module: product_proxy
+#: field:virt.disk,paint:0
+msgid "Paint"
+msgstr "Окраска"
+
+#. module: product_proxy
+#: field:parse_dict_keys,parent_key:0
+msgid "Parent key"
+msgstr "Ключ-владелец"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+msgid "Parse DIA"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+msgid "Parse ET"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+msgid "Parse PCD"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+msgid "Parse Painting"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+msgid "Parse WRSize"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse all name"
+msgstr "Отпарсить полностью"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse brand"
+msgstr ""
+
+#. module: product_proxy
+#: view:parse_dict_keys:product_proxy.parse_dict_keys_tree
+msgid "Parse dict"
+msgstr ""
+
+#. module: product_proxy
+#: view:parse_dict_keys:product_proxy.parse_dict_keys
+msgid "Parse dict form"
+msgstr "Форма словаря парсинга"
+
+#. module: product_proxy
+#: model:ir.actions.act_window,name:product_proxy.parse_dict_keys_act
+#: model:ir.ui.menu,name:product_proxy.parse_dict_keys_menu
+msgid "Parse dict keys"
+msgstr "Ключи парсинга"
+
+#. module: product_proxy
+#: model:ir.actions.act_window,name:product_proxy.parse_dict_vals_act
+#: model:ir.ui.menu,name:product_proxy.parse_dict_vals_menu
+#: view:parse_dict_vals:product_proxy.parse_dict_vals_tree
+msgid "Parse dict vals"
+msgstr "Значения ключей"
+
+#. module: product_proxy
+#: view:parse_dict_vals:product_proxy.parse_dict_vals
+msgid "Parse dict vals form"
+msgstr "Форма значений"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse model"
+msgstr ""
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.parse_name_disk_all_server_act
+msgid "Parse selected disks"
+msgstr "Отпарсить выбранные диски"
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.parse_name_all_server_act
+msgid "Parse selected tires"
+msgstr "Отпарсить выбранные шины"
+
+#. module: product_proxy
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse studness"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse wpd"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Parse wsp"
+msgstr ""
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.dict_data_id
+msgid "Parsing dictionaries"
+msgstr "Словари парсера"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Possible etalons"
+msgstr "Возможные эталоны (с сайта)"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "Possible non-etalons"
+msgstr "Возможные виртуальные товары поставщиков"
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.menu_root
+msgid "Price merge system"
+msgstr "Система стыковки прайсов"
+
+#. module: product_proxy
+#: view:product.proxy:product_proxy.product_proxy_form
+msgid "Pricelist data"
+msgstr "Информация прайса"
+
+#. module: product_proxy
+#: model:ir.model,name:product_proxy.model_product_product
+msgid "Product"
+msgstr "Продукт"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Product fields"
+msgstr "Поля продукта"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Product fields wich you can export"
+msgstr "Поля продукта, доступные для экспорта"
+
+#. module: product_proxy
+#: model:ir.actions.act_window,name:product_proxy.product_proxy_act
+#: model:ir.ui.menu,name:product_proxy.product_proxy_menu
+msgid "Product proxy"
+msgstr "Прокси записи"
+
+#. module: product_proxy
+#: help:imp.imp,url:0
+msgid "Provide a path to your file"
+msgstr "Задайте путь к файлу"
+
+#. module: product_proxy
+#: field:product.product,proxy_id:0
+msgid "Proxy id"
+msgstr ""
+
+#. module: product_proxy
+#: selection:imp.imp,imp_file:0
+msgid "Remote"
+msgstr "Удаленн."
+
+#. module: product_proxy
+#: field:virt.disk,etalonic_select:0
+#: field:virt.tire,etalonic_select:0
+msgid "Select etalonic tire"
+msgstr "Выберите эталонную шину"
+
+#. module: product_proxy
+#: field:virt.tire,reverse_etalonic_select:0
+msgid "Select non-etalon tire"
+msgstr "Выберите шину поставщика"
+
+#. module: product_proxy
+#: field:virt.disk,reverse_etalonic_select:0
+msgid "Select non-etalonic tire"
+msgstr "Подбор шин поставщиков"
+
+#. module: product_proxy
+#: field:product.product,virtual_type:0
+msgid "Select product type"
+msgstr "Выб. типа продукта"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Set chosen order"
+msgstr "Установить выбранный порядок"
+
+#. module: product_proxy
+#: view:imp.config:product_proxy.view_imp_config_form
+msgid "Set imp fields"
+msgstr "Утвердить список полей для текущей загрузки"
+
+#. module: product_proxy
+#: view:product.product:product_proxy.product_product_proxy_form_inh
+msgid "Set lowest price"
+msgstr "Установить наименьшую цену"
+
+#. module: product_proxy
+#: help:virt.disk,etalonic_list_domain:0
+msgid "Set this field for etalonic select criteria in a style                                                                             as odoo domain: [('wrsize', '=', wrsize),('dia', '=', dia)....]"
+msgstr "Задать подбор по полям в виде  [('wrsize', '=', wrsize),('dia', '=', dia)....] "
+
+#. module: product_proxy
+#: field:imp.imp,sheet_num:0
+msgid "Sheet number"
+msgstr "Номер листа"
+
+#. module: product_proxy
+#: field:virt.tire,tire_wsp:0
+msgid "Speed idx"
+msgstr "Индекс скорости"
+
+#. module: product_proxy
+#: selection:virt.tire,tire_studness:0
+msgid "Studdable"
+msgstr "Под шип"
+
+#. module: product_proxy
+#: selection:virt.tire,tire_studness:0
+msgid "Studded"
+msgstr "Шипованная"
+
+#. module: product_proxy
+#: field:virt.tire,tire_studness:0
+msgid "Studness"
+msgstr "Шипованность"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:product.proxy,supplier_id:0
+msgid "Supplier"
+msgstr "Поставщик"
+
+#. module: product_proxy
+#: field:imp.imp,name:0
+msgid "SupplierX"
+msgstr ""
+
+#. module: product_proxy
+#: field:product.proxy,proxy_ids:0
+msgid "Supplier`s info"
+msgstr "Информация поставщика"
+
+#. module: product_proxy
+#: field:product.proxy,price:0
+msgid "Suppliers price"
+msgstr "Цена поставщика"
+
+#. module: product_proxy
+#: field:product.proxy,quantity:0
+msgid "Suppliers quantity"
+msgstr "Количество у поставщика"
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.technical1_id
+msgid "Technical1"
+msgstr "Техническое"
+
+#. module: product_proxy
+#: field:virt.disk,type:0
+msgid "Type"
+msgstr "Тип"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+msgid "Type of File"
+msgstr "Тип файла"
+
+#. module: product_proxy
+#: field:parse_dict_vals,type:0
+msgid "Type of dict: tyre_brand or etc"
+msgstr "Тип словаря: disk_model, tyre_brand и т.п. "
+
+#. module: product_proxy
+#: field:parse_dict_keys,type:0
+msgid "Type of dict: tyre_model_tyre_brand_or_etc"
+msgstr "Тип словаря: disk_model, tyre_brand и т.п."
+
+#. module: product_proxy
+#: field:imp.imp,imp_type:0
+msgid "Type of file"
+msgstr "Тип файла"
+
+#. module: product_proxy
+#: view:imp.imp:product_proxy.view_imp_form
+#: field:imp.imp,model_name:0
+msgid "Type of info"
+msgstr "Тип информации"
+
+#. module: product_proxy
+#: field:imp.imp,unconect_count:0
+msgid "Unconected products"
+msgstr "Непристыкованные продукты"
+
+#. module: product_proxy
+#: field:product.proxy,uid_spl:0
+msgid "Unique identifier of price list position"
+msgstr "Уник. код в прайсе поставщика"
+
+#. module: product_proxy
+#: model:ir.actions.server,name:product_proxy.upd_list_price_sel_products_server_act
+msgid "Update price for selected products"
+msgstr "Обновить цену выбранных продуктов"
+
+#. module: product_proxy
+#: view:imp.config:product_proxy.view_imp_config_form
+msgid "Update product fields"
+msgstr "Получить перечень возможных полей"
+
+#. module: product_proxy
+#: field:imp.imp,url:0
+msgid "Url"
+msgstr ""
+
+#. module: product_proxy
+#: help:product.proxy,uid_spl:0
+msgid "Usually, supp_price_list_name+suppliers article the thing"
+msgstr "Чаще всего это конкат. имя_в_прайсе_поставщика+артикул_поставщика"
+
+#. module: product_proxy
+#: field:parse_dict_keys,value_ids:0
+msgid "Value ids"
+msgstr "Список значений ключа"
+
+#. module: product_proxy
+#: selection:virt.disk,type:0
+msgid "Vantazhny"
+msgstr "Грузовой"
+
+#. module: product_proxy
+#: selection:imp.config,data_type:0
+#: selection:imp.imp,model_name:0
+#: model:ir.actions.act_window,name:product_proxy.virtual_disk_act
+#: model:ir.ui.menu,name:product_proxy.virtual_disk_menu
+msgid "Virtual disk"
+msgstr "Виртуальный диск"
+
+#. module: product_proxy
+#: model:ir.ui.menu,name:product_proxy.vg_id
+msgid "Virtual goods"
+msgstr "Виртуальные товары"
+
+#. module: product_proxy
+#: selection:imp.config,data_type:0
+#: selection:imp.imp,model_name:0
+#: model:ir.actions.act_window,name:product_proxy.virtual_tire_act
+#: model:ir.ui.menu,name:product_proxy.virtual_tire_menu
+msgid "Virtual tire"
+msgstr "Виртуальная шина"
+
+#. module: product_proxy
+#: help:virt.disk,et:0
+msgid "Vylet diska (32)"
+msgstr "Вылет диска"
+
+#. module: product_proxy
+#: field:virt.disk,wrsize:0
+msgid "WRSize"
+msgstr "Ширина и диаметр"
+
+#. module: product_proxy
+#: selection:imp.imp,imp_type:0
+msgid "XLS"
+msgstr ""
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "autoconnect"
+msgstr "Автоконнект"
+
+#. module: product_proxy
+#: field:parse_dict_keys,child_keys:0
+msgid "child keys"
+msgstr "Дочерние ключи"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "clear parsed fields"
+msgstr "Очистить стыковочные поля"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "connect to me"
+msgstr "Состыковать с текущим"
+
+#. module: product_proxy
+#: help:virt.disk,dia:0
+msgid "diameter centrovochnogo otverstiya na diske (67.1)"
+msgstr "Диаметр центровочного отверстия на диске (67.1)"
+
+#. module: product_proxy
+#: view:virt.disk:product_proxy.virt_disk_form
+#: view:virt.tire:product_proxy.virt_tire_form
+msgid "disconnect from etalon"
+msgstr "отстыковать"
+
+#. module: product_proxy
+#: help:parse_dict_keys,child_keys:0
+msgid "fe: name of models  which are belong to the brand. used for faster parsing"
+msgstr "назв. моделей, входящих в бренд. Исп. для ускорения парсинга"
+
+#. module: product_proxy
+#: help:parse_dict_keys,parent_key:0
+msgid "fex: name of brand to which the model belongs. used for faster parsing"
+msgstr "назв. бренда, включающего эту модель. Исп. для ускор. парсинга"
+
+#. module: product_proxy
+#: view:imp.config:product_proxy.view_imp_config_tree
+msgid "imp config data xml tree"
+msgstr ""
+
+#. module: product_proxy
+#: help:product.proxy,default_code:0
+msgid "must be unique inside price list"
+msgstr "долж. быть уникальным в пределах прайса"
+
+#. module: product_proxy
+#: help:virt.disk,pcd:0
+msgid "quantity and diameter of mounting bores (4х98)"
+msgstr "к-во и диам. болтов (4х98)"
+
+#. module: product_proxy
+#: view:product.product:product_proxy.product_product_proxy_form_inh
+msgid "upd mag price"
+msgstr "обн. цену мадженто"
+
+#. module: product_proxy
+#: help:virt.disk,wrsize:0
+msgid "width of wheel in inches x radius oboda (6,5j x 15)"
+msgstr "ширина колеса в дюймах на диаметр обода  (6,5j x 15) "
+
