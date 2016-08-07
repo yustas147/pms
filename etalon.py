@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from osv import fields, osv
-from tools import logging
+from openerp.osv import fields, osv
+#from osv import fields, osv
+from openerp.tools import logging
+from openerp import pooler
+#from tools import logging
 #from tools.translate import _
 
 class pricelist_partnerinfo(osv.osv):
@@ -150,7 +153,8 @@ class product_product(osv.osv):
                         #'min_quantity':inst.imp_qty,
                         #'min_quantity':inst.imp_qty,
                         'price':inst.standard_price,
-                        }, context=context)
+                        }, context=False)
+#                        }, context=context)
         pool.get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id,})
 #        pool.get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id,}, context=context)
 
@@ -218,9 +222,9 @@ class product_product(osv.osv):
 
     
     def connect_bkg(self, cr, uid, ids, context = False):
-        
-        nonet_unconnected = osv.pooler.get_pool(cr.dbname).get('product.product').search(cr, uid, [('connected', '=', False), ('supplier', '!=', 1)])
-
+         
+        nonet_unconnected = pooler.get_pool(cr.dbname).get('product.product').search(cr, uid, [('connected', '=', False), ('supplier', '!=', 1)])
+ 
         for non_unc in nonet_unconnected :
             inst = self.browse(cr, uid, non_unc)
             etal_to_con = self.pool.get('product.product').search(cr, uid, [('default_code', '=', inst.default_code), ('supplier', '=', 1)])
@@ -228,25 +232,30 @@ class product_product(osv.osv):
                 etal_to_con_inst = self.browse(cr, uid, etal_to_con)
                 inst.etalon_product = etal_to_con_inst[0].id
                 if inst.price_ref:
-                    partner_info = osv.pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').browse(cr, uid, inst.price_ref.id, context=context)
-                    osv.pooler.get_pool(cr.dbname).get('product.supplierinfo').unlink(cr, uid, [partner_info.suppinfo_id.id], context=context)
-
-                suppl_info_id = osv.pooler.get_pool(cr.dbname).get('product.supplierinfo').create(cr, uid, {
+                    partner_info = pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').browse(cr, uid, inst.price_ref.id, context=context)
+#                    partner_info = osv.pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').browse(cr, uid, inst.price_ref.id, context=context)
+                    pooler.get_pool(cr.dbname).get('product.supplierinfo').unlink(cr, uid, [partner_info.suppinfo_id.id], context=context)
+#                    osv.pooler.get_pool(cr.dbname).get('product.supplierinfo').unlink(cr, uid, [partner_info.suppinfo_id.id], context=context)
+ 
+                suppl_info_id = pooler.get_pool(cr.dbname).get('product.supplierinfo').create(cr, uid, {
+#                suppl_info_id = osv.pooler.get_pool(cr.dbname).get('product.supplierinfo').create(cr, uid, {
                         'product_id':int(inst.etalon_product),
                         'name':int(inst.supplier),
                         'min_qty':1,
                         'product_code':inst.default_code,
                         'product_name':inst.name,
                         }, context=context)
-                part_info_id = osv.pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').create(cr, uid, {
+                part_info_id = pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').create(cr, uid, {
+#                part_info_id = osv.pooler.get_pool(cr.dbname).get('pricelist.partnerinfo').create(cr, uid, {
                         'suppinfo_id':suppl_info_id,
                         'sup_quantity':inst.imp_qty,
                         #'min_quantity':inst.imp_qty,
                         'price':inst.standard_price,
                         }, context=context)
-                osv.pooler.get_pool(cr.dbname).get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id, 'etalon_product':inst.etalon_product}, context=context)
+                pooler.get_pool(cr.dbname).get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id, 'etalon_product':inst.etalon_product}, context=context)
+#                osv.pooler.get_pool(cr.dbname).get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id, 'etalon_product':inst.etalon_product}, context=context)
                 #osv.pooler.get_pool(cr.dbname).get('product.product').write(cr, uid, inst.id,{'price_ref':part_info_id,}, context=context)
-
+ 
                 self.write(cr, uid, inst.id, {'connected':1})
         return True
                 
@@ -273,6 +282,7 @@ WHERE
 
     def conn_bkg(self, cr, uid, nonet_et, context=False):
         conn_prod_num = 0
+        pool = pooler.get_pool(cr.dbname)
         for nonet in nonet_et.keys():
             et_id = nonet_et[nonet]
             nonet_id = nonet
@@ -281,7 +291,7 @@ WHERE
             if inst.price_ref:
                 partner_info = pool.get('pricelist.partnerinfo').browse(cr, uid, inst.price_ref.id, context=context)
                 pool.get('product.supplierinfo').unlink(cr, uid, [partner_info.suppinfo_id.id], context=context)
-
+ 
             suppl_info_id = pool.get('product.supplierinfo').create(cr, uid, {
                         'product_id':inst.etalon_product.id,
                         'name':inst.supplier.id,
@@ -299,7 +309,7 @@ WHERE
             self.write(cr, uid, inst.id, {'connected':1})
             conn_prod_num += 1
         return conn_prod_num
-        
+         
 
 
     def fields_view_get(self, cr, uid, view_id=None, view_type='form', context={}, toolbar=True, submenu=True):
