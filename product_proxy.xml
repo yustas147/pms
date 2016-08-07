@@ -52,17 +52,18 @@
           </record>
           
            <!-- product_product ################################################# -->
+           <!-- product_template instead of product_product ################################################# -->
 
-          <record id="product_product_proxy_form_inh" model="ir.ui.view">
-            <field name="name">product.normal.form.proxy</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_normal_form_view" />
+          <record id="product_template_proxy_form_inh" model="ir.ui.view">
+            <field name="name">product_template.normal.form.proxy</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+<!--             <field name="inherit_id" ref="product.product_template_form_view" /> -->
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <xpath expr="//sheet" position="before">
                     <header>
                 		    <button name='open_virt' type='object' string='Open virtual product'/>
-                		    <!-- <button name='set_virtual_stock' type='object' string='Set virtual stock'/> -->
                 		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
                 		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
                 		    <button name='update_magento_price' type='object' string='upd mag price' />
@@ -86,6 +87,38 @@
                 </xpath>
             </field>
           </record>
+          <!-- <record id="product_product_proxy_form_inh" model="ir.ui.view">
+            <field name="name">product.normal.form.proxy</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="//sheet" position="before">
+                    <header>
+                		    <button name='open_virt' type='object' string='Open virtual product'/>
+                		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
+                		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
+                		    <button name='update_magento_price' type='object' string='upd mag price' />
+                    </header>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                	<page string="PMS">
+                		<group colspan="4">
+                			<field name="virtual_type"/>
+                			<field name="proxy_id"/>
+                			<field name="virt_stock"/>
+                		</group>
+                			<field name="proxy_ids">
+                			    <tree>
+		                			<field name="supplier_id"/>
+		                			<field name="quantity"/>
+		                			<field name="price"/>
+		                		</tree>
+                			</field>
+                	</page>
+                </xpath>
+            </field>
+          </record> -->
           
            <!-- virt_tire ################################################# -->
 
@@ -329,7 +362,8 @@
         </record>
            <record id="upd_list_price_sel_products_server_act" model="ir.actions.server">
                <field name="name">Update price for selected products</field>
-                <field name="model_id" ref="model_product_product"/> 
+                <field name="model_id" ref="model_product_template"/> 
+<!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.upd_prod_price_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
@@ -349,25 +383,29 @@
         </record>
        <record id="create_proxy_tires_server_act" model="ir.actions.server">
                <field name="name">Mark selected as TIRE and create proxies</field>
-                <field name="model_id" ref="model_product_product"/> 
+                <field name="model_id" ref="model_product_template"/> 
+<!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.create_proxy_tires_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
        <record id="create_proxy_disks_server_act" model="ir.actions.server">
                <field name="name">Mark selected as DISK and create proxies</field>
-                <field name="model_id" ref="model_product_product"/> 
+                <field name="model_id" ref="model_product_template"/> 
+<!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.create_proxy_disks_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
         <record id="create_proxy_disks_and_parse_server_act" model="ir.actions.server">
                <field name="name">Mark selected as DISK, create proxies and parse them.</field>
-                <field name="model_id" ref="model_product_product"/> 
+                <field name="model_id" ref="model_product_template"/> 
+<!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.create_proxy_and_parse_sel_ids(cr, uid, context.get('active_ids',[]), virt_type='virt.disk',context=context)</field>
         </record>
         <record id="create_proxy_tires_and_parse_server_act" model="ir.actions.server">
                <field name="name">Mark selected as TIRE, create proxies and parse them.</field>
-                <field name="model_id" ref="model_product_product"/> 
+                <field name="model_id" ref="model_product_template"/> 
+<!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.create_proxy_and_parse_sel_ids(cr, uid, context.get('active_ids',[]), virt_type='virt.tire',context=context)</field>
         </record>

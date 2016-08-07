@@ -47,9 +47,11 @@ class product_proxy(models.Model):
         self.etalon_id = False
             
     
-class product_product(models.Model):
-    _name = 'product.product'
-    _inherit = 'product.product'
+class product_template(models.Model):
+#class product_product(models.Model):
+# i decided to change product.product on product_template
+    _name = 'product.template'
+    _inherit = 'product.template'
     
     proxy_id = fields.Many2one('product.proxy', domain="[('if_etalon', '=', True)]")
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
