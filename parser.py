@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #from openerp.osv import fields, osv 
 from openerp import models, fields, api, http
-import re
+import re, logging
 
 #changes symb_a by symb_b in string
 def ch_symb(strng, symb_a, symb_b):
@@ -68,7 +68,10 @@ class Parser(http.Controller):
             res[k_n] = []
             for v in k.value_ids:
                 res[k_n].append(v.name)
-            res[k_n].sort(key=len, reverse=True)
+            try:
+                res[k_n].sort(key=len, reverse=True)
+            except:
+                _logger.error("Empty dict error: "+ unicode(res[k_n]))
         self.ddict = res
         return res
 
