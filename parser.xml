@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
 	<data>
-		<record id="parse_dict_keys_tree" model="ir.ui.view">
+		<record id="parse_dict_keys_view_tree" model="ir.ui.view">
 			<field name="name">parse_dict_keys.tree</field>
 			<field name="model">parse_dict_keys</field>
 			<field name="type">tree</field>
@@ -14,7 +14,7 @@
 			</field>
 				
 		</record>
-		<record id="parse_dict_vals_tree" model="ir.ui.view">
+		<record id="parse_dict_vals_view_tree" model="ir.ui.view">
 			<field name="name">parse_dict_vals.tree</field>
 			<field name="model">parse_dict_vals</field>
 			<field name="type">tree</field>
@@ -28,7 +28,7 @@
 				
 		</record>
 		
-		<record id="parse_dict_keys" model="ir.ui.view">
+		<record id="parse_dict_keys_form_view" model="ir.ui.view">
 			<field name="name">parse_dict_keys.form</field>
 			<field name="model">parse_dict_keys</field>
 			<field name="type">form</field>
@@ -49,7 +49,7 @@
 				</form>
 			</field>
 		</record>
-		<record id="parse_dict_vals" model="ir.ui.view">
+		<record id="parse_dict_vals_form_view" model="ir.ui.view">
 			<field name="name">parse_dict_vals.form</field>
 			<field name="model">parse_dict_vals</field>
 			<field name="type">form</field>
