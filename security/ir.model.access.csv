@@ -4,3 +4,5 @@ virt_tire,virt.tire,model_virt_tire,pms_manager,1,1,1,1
 imp_imp,imp.imp,model_imp_imp,pms_manager,1,1,1,1
 imp_imp_config,imp.config,model_imp_config,pms_manager,1,1,1,1
 product_proxy,product.proxy,model_product_proxy,pms_manager,1,1,1,1
+parse_dict_keys,parse_dict_keys,model_parse_dict_keys,pms_manager,1,1,1,1
+parse_dict_vals,parse_dict_vals,model_parse_dict_vals,pms_manager,1,1,1,1
