@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="pms_manager" model="res.groups">
+            <field name="name">PMS / Manager</field>
+        </record>
+    </data>
+</openerp>

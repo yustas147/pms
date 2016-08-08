@@ -9,7 +9,8 @@
     'version': '0.1',
     'depends': ['base','crm','sale'],
     'data': [
-        'product_proxy.xml', 'menu.xml', 'imp_data.xml', 'imp_config_data.xml', 'parser.xml'
+        'security/security.xml',
+        'security/ir.model.access.csv','product_proxy.xml', 'menu.xml', 'imp_data.xml', 'imp_config_data.xml', 'parser.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

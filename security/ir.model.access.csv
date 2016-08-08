@@ -1,0 +1,6 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+virt_disk,virt.disk,model_virt_disk,pms_manager,1,1,1,1
+virt_tire,virt.tire,model_virt_tire,pms_manager,1,1,1,1
+imp_imp,imp.imp,model_imp_imp,pms_manager,1,1,1,1
+imp_imp_config,imp.config,model_imp_config,pms_manager,1,1,1,1
+product_proxy,product.proxy,model_product_proxy,pms_manager,1,1,1,1
