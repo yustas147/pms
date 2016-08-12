@@ -15,6 +15,12 @@ def ch_symb(strng, symb_a, symb_b):
 
 dp = lambda strng: ch_symb(strng, ',', '.')
 
+def add_dot_null(strng):
+    res=strng.strip()
+    if '.' not in strng:
+        res=strng.strip()+'.0'
+    return res
+
 #changes string on string with prefix
 def prefstr(strng, pref):
     return unicode(pref)+unicode(strng)
@@ -266,8 +272,10 @@ class wxrParser(Parser):
             mg4 = float(dp(matched.group(4)))
 #            mg4 = float(ch_symb(matched.group(4),',','.'))
             if mg2 > mg4:
-                return (dp(matched.group(4))+'x'+dp(matched.group(2))+'__'+ matched.group(1)+' '+matched.group(5)) 
-            return (dp(matched.group(2))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
+                return (dp(matched.group(4))+'x'+add_dot_null(dp(matched.group(2)))+'__'+ matched.group(1)+' '+matched.group(5)) 
+        #        return (dp(matched.group(4))+'x'+dp(matched.group(2))+'__'+ matched.group(1)+' '+matched.group(5)) 
+            return (add_dot_null(dp(matched.group(2)))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
+#            return (dp(matched.group(2))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
 
         def wxr(cell):
 ##            re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
