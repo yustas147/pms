@@ -272,7 +272,8 @@ class wxrParser(Parser):
             mg4 = float(dp(matched.group(4)))
 #            mg4 = float(ch_symb(matched.group(4),',','.'))
             if mg2 > mg4:
-                return (dp(matched.group(4))+'x'+add_dot_null(dp(matched.group(2)))+'__'+ matched.group(1)+' '+matched.group(5)) 
+                return (add_dot_null(dp(matched.group(4)))+'x'+dp(matched.group(2))+'__'+ matched.group(1)+' '+matched.group(5)) 
+#                return (dp(matched.group(4))+'x'+add_dot_null(dp(matched.group(2)))+'__'+ matched.group(1)+' '+matched.group(5)) 
         #        return (dp(matched.group(4))+'x'+dp(matched.group(2))+'__'+ matched.group(1)+' '+matched.group(5)) 
             return (add_dot_null(dp(matched.group(2)))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
 #            return (dp(matched.group(2))+'x'+dp(matched.group(4))+'__'+ matched.group(1)+' '+matched.group(5)) 
