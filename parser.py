@@ -10,8 +10,8 @@ def ch_symb(strng, symb_a, symb_b):
         pos = lst.index(symb_a)
         res = lst[:pos]+list(symb_b)+lst[pos+1:]
         res = ''.join(res)
-        return res
-    return strng
+        return res.strip()
+    return strng.strip()
 
 dp = lambda strng: ch_symb(strng, ',', '.')
 
