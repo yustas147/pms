@@ -266,7 +266,7 @@ class virt_disk(models.Model):
     def _get_reverse_etalonic_ids(self):
         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', False)])
-        self.etalonic_list = et_rset
+        self.reverse_etalonic_list = et_rset
      
         
 #     @api.one
