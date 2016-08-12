@@ -45,6 +45,28 @@ class product_proxy(models.Model):
     @api.one
     def disconnect_etalon(self):
         self.etalon_id = False
+    
+    @api.multi
+    @api.model
+    def open_product_template(self):
+    #Define model name of agreement:
+        sid = self.id
+      #  print "########################################## sid:      "+unicode(sid)
+        senv = http.request.env['product.template']
+        senv = self.env['product.template']
+        product_template_id=senv.search([('proxy_id.id','=',sid)])
+        if len(product_template_id):
+            product_template_id = product_template_id[0].id
+     #   print "########################################## product_template_id:      "+unicode(product_template_id)
+        #print mod_name
+            return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'product.template',
+            'res_id': product_template_id,
+            "views": [[False, "form"]],
+            }
             
     
 class product_template(models.Model):
@@ -342,12 +364,19 @@ class virt_disk(models.Model):
 #     
     @api.one
     def autoconnect(self):
-        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),
-                               ('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
-        if len(et_rset):
-            self.etalonic_select = et_rset[0].id
-            self.etalon_id = et_rset[0].proxy_id.id
+        if (self.wrsize and self.pcd and self.brand and self.model and self.dia and self.et and self.paint):
+            et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), ('model','=',self.model),
+                                   ('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
+            if len(et_rset):
+                self.etalonic_select = et_rset[0].id
+                self.etalon_id = et_rset[0].proxy_id.id
         
+    def autoconnect_all_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.autoconnect()
+            _logger.info(unicode(inst.name)+"         autoconnected!")
+
     
     def parse_name_all_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
@@ -484,11 +513,19 @@ class virt_tire(models.Model):
 
     @api.one
     def autoconnect(self):
-        et_rset = self.search([('tire_wsp', '=', self.tire_wsp), ('tire_wpd', '=', self.tire_wpd), ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
-                               ('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
-        if len(et_rset):
-            self.etalonic_select = et_rset[0].id
-            self.etalon_id = et_rset[0].proxy_id.id
+        if (self.tire_brand and self.tire_model and self.tire_studness and self.tire_wpd and self.tire_wsp):
+            et_rset = self.search([('tire_wsp', '=', self.tire_wsp), ('tire_wpd', '=', self.tire_wpd), ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
+                                   ('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
+            if len(et_rset):
+                self.etalonic_select = et_rset[0].id
+                self.etalon_id = et_rset[0].proxy_id.id
+
+
+    def autoconnect_all_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.autoconnect()
+            _logger.info(unicode(inst.name)+"         autoconnected!")
 
     @api.multi
     @api.model

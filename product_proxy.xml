@@ -12,6 +12,7 @@
                 <form>
                   <head>
                 	  <button name='get_lower_price' type='object' string='Get lower price' />
+                	  <button name='open_product_template' type='object' string='Open product template' />
                   </head>
                   <sheet>
                   <group col="8">
@@ -200,6 +201,7 @@
 		                	<field name="tire_wpd"/>	
                 			<field name="default_code"/>
 	                		<field name="if_etalon"  />
+	                		<field name="etalon_id"  />
 
                 </tree>
          	</field> 
@@ -295,6 +297,7 @@
 	                		<field name="if_etalon"  />
      	                	<field name="type"/>	
 		                	<field name="country"/>	
+		                	<field name="etalon_id"/>	
                 </tree>
          	</field> 
           </record>
@@ -408,6 +411,19 @@
 <!--                 <field name="model_id" ref="model_product_product"/>  -->
                <field name="state">code</field>
                <field name="code">action = self.create_proxy_and_parse_sel_ids(cr, uid, context.get('active_ids',[]), virt_type='virt.tire',context=context)</field>
+        </record>
+        
+        <record id="autoconnect_sel_virt_tires_server_act" model="ir.actions.server">
+               <field name="name">Autoconnect to etalons all selected virtual TIRES </field>
+                <field name="model_id" ref="model_virt_tire"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.autoconnect_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+        <record id="autoconnect_sel_virt_disks_server_act" model="ir.actions.server">
+               <field name="name">Autoconnect to etalons all selected virtual DISKS </field>
+                <field name="model_id" ref="model_virt_disk"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.autoconnect_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
              
        <record model="ir.values" id="parse_all_name_disk_ir_values_id">
