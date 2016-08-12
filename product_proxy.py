@@ -105,7 +105,8 @@ class product_template(models.Model):
     def upd_prod_price_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
-            inst.update_magento_price()
+            inst.set_lowest_lst_price()
+#            inst.update_magento_price()
             _logger.info(unicode(inst.name)+"         price updated!")
         
 
@@ -116,9 +117,9 @@ class product_template(models.Model):
     @api.multi
     @api.model
     def set_lowest_lst_price(self):
-       newprice = self.proxy_id.get_lower_price() 
-       if newprice:
-           self.standard_price = newprice
+        newprice = self.proxy_id.get_lower_price() 
+        if newprice:
+            self.standard_price = newprice
 #           self.lst_price = newprice
         
         
