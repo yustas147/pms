@@ -105,7 +105,7 @@ class product_template(models.Model):
     def upd_prod_price_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
-            inst.set_lowest_lst_price()
+            inst.update_magento_price()
 #            inst.update_magento_price()
             _logger.info(unicode(inst.name)+"         price updated!")
         
@@ -239,12 +239,8 @@ class virt_disk(models.Model):
     paint = fields.Char('Paint')
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
-    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et), \
-                                                            ('pcd', '=', pcd), ('brand','=',brand),('model','=',model), \
-                                                            ('if_etalon','=',True)]", string = 'Select etalonic tire')
-    reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),\
-                                                                    ('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),\
-                                                                    ('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
+    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
+    reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
     etalonic_list_domain = fields.Text(string="Etalonic list domain", help="Set this field for etalonic select criteria in a style \
