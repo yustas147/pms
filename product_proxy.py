@@ -239,7 +239,8 @@ class virt_disk(models.Model):
     paint = fields.Char('Paint')
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
-    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
+    etalonic_select = fields.Many2one('virt.disk', domain="[('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
+#    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
     reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
@@ -260,12 +261,14 @@ class virt_disk(models.Model):
     def _get_etalonic_ids(self):
         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
+        _logger.info('_get_etalonic_ids: '+unicode(et_rset))
         self.etalonic_list = et_rset
     
     @api.one
     def _get_reverse_etalonic_ids(self):
         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', False)])
+        _logger.info('_get_reverse_etalonic_ids: '+unicode(et_rset))
         self.reverse_etalonic_list = et_rset
      
         
