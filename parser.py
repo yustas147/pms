@@ -160,14 +160,16 @@ class brandParser(Parser):
             res = False
             if len(self.ddict[keyp]) > 0:
                 for val in self.ddict[keyp]:
-                    res = parse_by_val(val)
+                    res = parse_by_val(val.strip())
+#                    res = parse_by_val(val)
                     if res:
                         ''' Put found key in the parser cache '''
                         self.cached_key.add(keyp)
                         return keyp, res
-            res = parse_by_val(keyp)
+            res = parse_by_val(keyp.strip())
+#            res = parse_by_val(keyp)
             if res:
-                return keyp, res
+                return keyp.strip(), res
                 
             return res
         
