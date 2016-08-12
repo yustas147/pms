@@ -256,108 +256,87 @@ class virt_disk(models.Model):
         _logger.info('n_inst is:  '+unicode(n_inst))
         n_inst.write({'etalon_id':self.proxy_id.id})
     
+    @api.one
+    def _get_etalonic_ids(self):
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
+        self.etalonic_list = et_rset
+    
+    @api.one
+    def _get_reverse_etalonic_ids(self):
+        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
+        self.etalonic_list = et_rset
+     
+        
 #     @api.one
 #     def _get_etalonic_ids(self):
-#         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
-#         self.etalonic_list = et_rset
-#     
-#     @api.one
-#     def _get_etalonic_ids(self):
-#         if self.etalonic_list_domain:
-#             _logger.info("self.etalonic_list_domain STRAIGHT:  "+unicode(self.etalonic_list_domain))
-#             evall = []
+#         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
+# 
 #             try:
-#                 evall = eval(self.etalonic_list_domain)
+#                 domlist = eval(self.etalonic_list_domain) 
 #             except:
-#                 _logger.error("error in STRAIGHT: "+unicode(self.etalonic_list_domain))
-#             _logger.info("evall: "+unicode(evall))
-#             if len(evall) == 1:
-#                 slist = evall
-#                 _logger.info("slist == evall!!! ")
+#                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
+#                 domlist = []
+#                 
+#             dyndom_lst = ["('if_etalon', '=', True)"] 
+#             et_rset=False
+#             len_domlist = len(domlist)
+#             if len_domlist == 0:
+#                 return False
 #             else:
-#                 slist = [i for i in evall]
-#             _logger.info("slist: "+unicode(slist))
-# 
-#             et_rset = False
-# 
-#             try:
-#                 et_rset = self.search(slist)
-#             except: 
-#                 _logger.error("error was in STRAIGHT search: "+unicode(slist))
+#                 for fld in domlist:
+#                     spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+#                     _logger.info("spar is:"+unicode(spar))
+#                     dyndom_lst.append(spar)
+#                 dyndom_str = ",".join(dyndom_lst)
+#                 try:
+#                     et_rset = self.search([i for i in eval(dyndom_str)])
+#                 except:
+#                     _logger.error("search error: "+unicode(dyndom_str))
+#                 
 #         else:
 #             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
 #                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
 #         self.etalonic_list = et_rset
         
-    @api.one
-    def _get_etalonic_ids(self):
-        if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-
-            try:
-                domlist = eval(self.etalonic_list_domain) 
-            except:
-                _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
-                domlist = []
-                
-            dyndom_lst = ["('if_etalon', '=', True)"] 
-            et_rset=False
-            len_domlist = len(domlist)
-            if len_domlist == 0:
-                return False
-            else:
-                for fld in domlist:
-                    spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
-                    _logger.info("spar is:"+unicode(spar))
-                    dyndom_lst.append(spar)
-                dyndom_str = ",".join(dyndom_lst)
-                try:
-                    et_rset = self.search([i for i in eval(dyndom_str)])
-                except:
-                    _logger.error("search error: "+unicode(dyndom_str))
-                
-        else:
-            et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
-        self.etalonic_list = et_rset
         
-        
-    @api.one
-    def _get_reverse_etalonic_ids(self):
-        if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-
-       #     _logger.info('self is:  '+unicode(self))
-       #     _logger.info('self wrsize is:  '+unicode(self.wrsize))
-       #     _logger.info(unicode(self.etalonic_list_domain))
-            try:
-                 domlist = eval(self.etalonic_list_domain) 
-            except:
-                _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
-                domlist = []
-                
-       #     _logger.info("domlist: "+unicode(domlist))
-            dyndom_lst = ["('if_etalon', '=', False)"] 
-            et_rset=False
-            len_domlist = len(domlist)
-            if len_domlist == 0:
-                return False
-            else:
-                for fld in domlist:
-                    spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
-                    _logger.info("spar is:"+unicode(spar))
-                    dyndom_lst.append(spar)
-                #_logger.info("dyndom_lst: "+unicode(dyndom_lst))
-                dyndom_str = ",".join(dyndom_lst)
-                #_logger.info("dyndom_str: "+unicode(dyndom_str))
-                try:
-                    et_rset = self.search([i for i in eval(dyndom_str)])
-                except:
-                    _logger.error("search error: "+unicode(dyndom_str))
-                
-        else:
-            et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
-        self.reverse_etalonic_list = et_rset
+#     @api.one
+#     def _get_reverse_etalonic_ids(self):
+#         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
+# 
+#        #     _logger.info('self is:  '+unicode(self))
+#        #     _logger.info('self wrsize is:  '+unicode(self.wrsize))
+#        #     _logger.info(unicode(self.etalonic_list_domain))
+#             try:
+#                  domlist = eval(self.etalonic_list_domain) 
+#             except:
+#                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
+#                 domlist = []
+#                 
+#        #     _logger.info("domlist: "+unicode(domlist))
+#             dyndom_lst = ["('if_etalon', '=', False)"] 
+#             et_rset=False
+#             len_domlist = len(domlist)
+#             if len_domlist == 0:
+#                 return False
+#             else:
+#                 for fld in domlist:
+#                     spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+#                     _logger.info("spar is:"+unicode(spar))
+#                     dyndom_lst.append(spar)
+#                 #_logger.info("dyndom_lst: "+unicode(dyndom_lst))
+#                 dyndom_str = ",".join(dyndom_lst)
+#                 #_logger.info("dyndom_str: "+unicode(dyndom_str))
+#                 try:
+#                     et_rset = self.search([i for i in eval(dyndom_str)])
+#                 except:
+#                     _logger.error("search error: "+unicode(dyndom_str))
+#                 
+#         else:
+#             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
+#         self.reverse_etalonic_list = et_rset
 #     
     @api.one
     def autoconnect(self):
@@ -548,8 +527,8 @@ class virt_tire(models.Model):
                                ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
                                ('tire_studness','=',self.tire_studness),('if_etalon', '=', True)])
         self.etalonic_list = et_rset
-    @api.one
 
+    @api.one
     def _get_reverse_etalonic_ids(self):
         et_rset = self.search([('tire_wpd', '=', self.tire_wpd), ('tire_wsp', '=', self.tire_wsp),
                                 ('tire_brand', '=', self.tire_brand), ('tire_model','=',self.tire_model),
