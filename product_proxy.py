@@ -410,6 +410,9 @@ class virt_disk(models.Model):
     @api.multi 
     @api.model
     def parse_model(self):
+        if not self.brand:
+            _logger.error( "########## NOT set BRAND for model parsing in: "+ unicode(self.name))
+            return False
         parser = modelParser(parse_string=self.name, dict_type='disk_model', parent_key=self.brand, parent_key_dict_type='disk_brand')
         parsed_model, name_minus_model = parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
@@ -418,7 +421,7 @@ class virt_disk(models.Model):
             self.name_unparsed = name_minus_model
         else:
             _logger.warning("########## model not found in name: "+ unicode(self.name))
-        return True 
+        return parsed_model 
     
     @api.multi 
     @api.model
