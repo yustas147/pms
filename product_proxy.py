@@ -209,7 +209,7 @@ class product_template(models.Model):
         'res_id': self.get_virt_id(mod_name),
         "views": [[False, "form"]],
         }
-            
+  
             
         
     
@@ -246,6 +246,29 @@ class virt_disk(models.Model):
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
     etalonic_list_domain = fields.Text(string="Etalonic list domain", help="Set this field for etalonic select criteria in a style \
                                                                             as odoo domain: [('wrsize', '=', wrsize),('dia', '=', dia)....]")
+    
+    
+    @api.multi
+    @api.model
+    def open_brand_dict(self):
+    #Define model name of agreement:
+        mod_name = 'parse_dict_keys'
+        mod_env = http.request.env[mod_name]
+        rec_id = mod_env.search([('type','=','disk_brand'),('name','=',self.brand)])
+        if len(rec_id):
+            rec_id = rec_id[0].id
+        #print mod_name
+            return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': mod_name,
+            'res_id': rec_id,
+            "views": [[False, "form"]],
+            }
+        return False
+    
+    
     
     @api.multi
     @api.model
@@ -677,4 +700,26 @@ class virt_tire(models.Model):
         else:
             _logger.warning( "########## wsp not found in name: "+ unicode(self.name))
         return True
+    
+          
+    @api.multi
+    @api.model
+    def open_brand_dict(self):
+    #Define model name of agreement:
+        mod_name = 'parse_dict_keys'
+        mod_env = http.request.env[mod_name]
+        rec_id = mod_env.search([('type','=','tyre_brand'),('name','=',self.tire_brand)])
+        if len(rec_id):
+            rec_id = rec_id[0].id
+        #print mod_name
+            return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': mod_name,
+            'res_id': rec_id,
+            "views": [[False, "form"]],
+            }
+        return False
+            
 

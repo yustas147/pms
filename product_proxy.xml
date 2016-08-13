@@ -142,6 +142,7 @@
 	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>
+	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
 				    </header>
                		<sheet>
                		    <group>
@@ -229,6 +230,7 @@
 	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>	
+	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
 				    </header>
                		<sheet>
                		    <group>
