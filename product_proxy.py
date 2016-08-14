@@ -239,14 +239,31 @@ class virt_disk(models.Model):
     paint = fields.Char('Paint')
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
-    etalonic_select = fields.Many2one('virt.disk', domain="[('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
-#    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
+    etalonic_select = fields.Many2one('virt.disk',  string = 'Select etalonic tire') 
+#    etalonic_select = fields.Many2one('virt.disk', domain="[('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
+##    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
     reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
-    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.disk', string = 'Possible etalon virt disks')
-    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
-    etalonic_list_domain = fields.Text(string="Etalonic list domain", help="Set this field for etalonic select criteria in a style \
-                                                                            as odoo domain: [('wrsize', '=', wrsize),('dia', '=', dia)....]")
+    etalonic_list = fields.One2many(compute='_get_etalonic_ids2', comodel_name='virt.disk', string = 'Possible etalon virt disks')
+    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids2', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
+    #etalonic_list_domain = fields.Text(string="Etalonic list domain", 
+    #                                   help="Set this field for etalonic select criteria in a style as odoo domain: [('wrsize', '=', wrsize),('dia', '=', dia)....]",
+    #                                   default="['brand','model','pcd','wrsize','et','dia','paint']")
+    chkF_brand = fields.Boolean("Brand")
+    chkF_model = fields.Boolean("Model")
+    chkF_wrsize = fields.Boolean("WxD")
+    chkF_pcd = fields.Boolean("PCD")
+    chkF_dia = fields.Boolean("DIA")
+    chkF_et = fields.Boolean("ET")
+    chkF_paint = fields.Boolean("Paint")
+                                                                            
     
+    
+                    
+
+    
+    @api.one
+    def set_default_etalonic_list_domain(self):
+        self.etalonic_list_domain = "['brand','model','pcd','wrsize','et','dia','paint']"
     
     @api.multi
     @api.model
@@ -280,31 +297,130 @@ class virt_disk(models.Model):
         _logger.info('n_inst is:  '+unicode(n_inst))
         n_inst.write({'etalon_id':self.proxy_id.id})
     
+#     @api.one
+#     def _get_etalonic_ids(self):
+#         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
+#         _logger.info('_get_etalonic_ids: '+unicode(et_rset))
+#         self.etalonic_list = et_rset
+#     
+#     @api.one
+#     def _get_reverse_etalonic_ids(self):
+#         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
+#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', False)])
+#         _logger.info('_get_reverse_etalonic_ids: '+unicode(et_rset))
+#         self.reverse_etalonic_list = et_rset
+
     @api.one
-    def _get_etalonic_ids(self):
-        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
-        _logger.info('_get_etalonic_ids: '+unicode(et_rset))
+    def get_chkF(self):
+        res = []
+        res_def = []
+        for fld in self.fields_get_keys():
+            if 'chkF' in fld:
+                print fld
+                fval = eval('self.'+fld)
+                res_def.append(fld[5:])
+                if fval:
+                    res.append(fld[5:])
+        print 'res: '+unicode(res)
+        print 'res_def :'+unicode(res_def)
+        if len(res) > 0:
+            return res
+        return res_def
+
+
+    @api.one
+    @api.depends('chkF_brand','chkF_model','chkF_wrsize','chkF_dia','chkF_et','chkF_pcd','chkF_paint')
+    def _get_etalonic_ids2(self):
+        if self.if_etalon:
+            return []
+        domlist = self.get_chkF()[0]
+        print 'domlist: '+unicode(domlist)
+        dyndom_lst = ["('if_etalon', '=', True)"] 
+        et_rset=False
+        for fld in domlist:
+            print "fld : "+unicode(fld)
+ #           spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+            print 'self.fld: '+unicode(eval('self.'+fld))
+            spar = '('+ "'"+fld+"'" +","+ "'='" +","+ 'self.'+fld + ')'
+            _logger.info("spar is:"+unicode(spar))
+            dyndom_lst.append(spar)
+        dyndom_str = ",".join(dyndom_lst)
+        print 'dyndom_str: '+unicode(dyndom_str)
+        try:
+            et_rset = self.search([i for i in eval(dyndom_str)])
+        except:
+            _logger.error("search error: "+unicode(dyndom_str))
         self.etalonic_list = et_rset
-    
+        
     @api.one
-    def _get_reverse_etalonic_ids(self):
-        et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-                               ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', False)])
-        _logger.info('_get_reverse_etalonic_ids: '+unicode(et_rset))
+    @api.depends('chkF_brand','chkF_model','chkF_wrsize','chkF_dia','chkF_et','chkF_pcd','chkF_paint')
+    def _get_reverse_etalonic_ids2(self):
+        if not self.if_etalon:
+            return []
+        domlist = self.get_chkF()[0]
+        print 'domlist: '+unicode(domlist)
+        dyndom_lst = ["('if_etalon', '=', False)"] 
+        et_rset=False
+        for fld in domlist:
+            print "fld : "+unicode(fld)
+ #           spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+            print 'self.fld: '+unicode(eval('self.'+fld))
+            spar = '('+ "'"+fld+"'" +","+ "'='" +","+ 'self.'+fld + ')'
+            _logger.info("spar is:"+unicode(spar))
+            dyndom_lst.append(spar)
+        dyndom_str = ",".join(dyndom_lst)
+        print 'dyndom_str: '+unicode(dyndom_str)
+        try:
+            et_rset = self.search([i for i in eval(dyndom_str)])
+        except:
+            _logger.error("search error: "+unicode(dyndom_str))
         self.reverse_etalonic_list = et_rset
-     
+        
+        
+#    @api.onchange('etalonic_list')
+    @api.onchange('chkF_brand','chkF_model','chkF_wrsize','chkF_dia','chkF_et','chkF_pcd','chkF_paint','etalonic_list')
+    def onchange_mult_etalonic_select(self):
+
+#         def check_cur_state(self,f_list):
+#             res = True
+#             v_list = [eval('self.'+x) for x in f_list]
+#             return res
+        
+        #flist = ['etalonic_select']
+        
+        #check_cur_state(self,flist)
+        res = {}
+        res['domain'] = { 'etalonic_select':[] }
+        res['domain']['etalonic_select'].append(('id','in', self.etalonic_list.mapped('id')))
+#        res['domain'] = { x:[] for x in flist }
+#        res['value'] = {}
+        print "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU: "+unicode(res)
+        return res
+
+    
         
 #     @api.one
 #     def _get_etalonic_ids(self):
+#         possible_field_list = ['brand','model','pcd','wrsize','et','dia','paint']
 #         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-# 
+#  
 #             try:
 #                 domlist = eval(self.etalonic_list_domain) 
+# 
 #             except:
 #                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
 #                 domlist = []
+#             try:
+#                 for fld in domlist:
+#                     if fld not in possible_field_list:
+#                         domlist = []
+#                         break
+#             except:
+#                 _logger.error("Something wrong with domlist: "+unicode(self.etalonic_list_domain))
 #                 
+#                     
+#                  
 #             dyndom_lst = ["('if_etalon', '=', True)"] 
 #             et_rset=False
 #             len_domlist = len(domlist)
@@ -320,27 +436,36 @@ class virt_disk(models.Model):
 #                     et_rset = self.search([i for i in eval(dyndom_str)])
 #                 except:
 #                     _logger.error("search error: "+unicode(dyndom_str))
-#                 
+#                  
 #         else:
 #             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
 #                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
 #         self.etalonic_list = et_rset
-        
-        
+#         
+#         
 #     @api.one
 #     def _get_reverse_etalonic_ids(self):
+#         possible_field_list = ['brand','model','pcd','wrsize','et','dia','paint']
 #         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-# 
-#        #     _logger.info('self is:  '+unicode(self))
-#        #     _logger.info('self wrsize is:  '+unicode(self.wrsize))
-#        #     _logger.info(unicode(self.etalonic_list_domain))
+#  
+# #     _logger.info('self is:  '+unicode(self))
+# #     _logger.info('self wrsize is:  '+unicode(self.wrsize))
+# #     _logger.info(unicode(self.etalonic_list_domain))
 #             try:
-#                  domlist = eval(self.etalonic_list_domain) 
+#                 domlist = eval(self.etalonic_list_domain) 
 #             except:
 #                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
 #                 domlist = []
-#                 
-#        #     _logger.info("domlist: "+unicode(domlist))
+# 
+#             try:
+#                 for fld in domlist:
+#                     if fld not in possible_field_list:
+#                         domlist = []
+#                         break
+#             except:
+#                 _logger.error("Something wrong with domlist: "+unicode(self.etalonic_list_domain))
+#                  
+# #     _logger.info("domlist: "+unicode(domlist))
 #             dyndom_lst = ["('if_etalon', '=', False)"] 
 #             et_rset=False
 #             len_domlist = len(domlist)
@@ -358,7 +483,7 @@ class virt_disk(models.Model):
 #                     et_rset = self.search([i for i in eval(dyndom_str)])
 #                 except:
 #                     _logger.error("search error: "+unicode(dyndom_str))
-#                 
+#                  
 #         else:
 #             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
 #                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
@@ -372,6 +497,10 @@ class virt_disk(models.Model):
             if len(et_rset):
                 self.etalonic_select = et_rset[0].id
                 self.etalon_id = et_rset[0].proxy_id.id
+    @api.one
+    def manual_connect(self):
+        if self.etalonic_select:
+            self.etalon_id = self.etalonic_select.proxy_id.id
         
     def autoconnect_all_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:

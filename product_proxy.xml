@@ -227,56 +227,94 @@
 	                   <button name="parse_paint" string="Parse Painting" type="object" attrs="{'invisible':[('paint', '!=', False)]}" class="oe_highlight"/>	
 <!-- 	                   <button name="get_parser_dict" string="Export dict data for parser" type="object" />	 -->
 	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('if_etalon', '=', True)]}"/>	
+	                   <button name="manual_connect" string="manual connect" type="object" attrs="{'invisible':[('if_etalon', '=', True)]}"/>	
 	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>	
 	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
 				    </header>
                		<sheet>
-               		    <group>
-	            			<group name="Common data" colspan="1" >
-	                			<field name="name"/>
-		                		<field name="supplier_id"  />
-		                		<field name="if_etalon"  />
-			                	<field name="brand"/>	
-			                	<field name="model"/>	
-			                	<field name="wrsize"/>	
-			                	<field name="pcd"/>	
-			                	<field name="et"/>	
-			                	<field name="dia"/>	
-			                	<field name="paint"/>	
-			                	<field name="type"/>	
-			                	<field name="country"/>	
-	            			</group>
-	            			<group name="Specific data"  colspan="1">
-	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-                    			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-                    			<field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-                    			<field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/> 
-                    			<label string="Possible etalons" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', True)]}">
-	                		    	<tree>
-	                		    	    <field name="name" />
-	                		    	</tree>
-	                		    </field>
-                    			<label string="Possible non-etalons" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
-	                		    <field name="reverse_etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', False)]}" >
-	                		    	<tree>
-	                		    	    <field name="name" />
-	                		    	</tree>
-	                		    </field>
-	                		    <field name="etalonic_list_domain"/>
-	                	    </group>
-                	    </group>
-	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
-	                		<tree>
-	                			<field name="supplier_id"/>
-	                			<field name="quantity"/>
-	                			<field name="price"/>
-	                		</tree>
-	                	</field>
+	                		    <table>
+	                		        <thead>
+            	                		<h1>	<field name="name" nolabel="1" class="oe_center"/></h1>
+	                		        </thead>
+	                		        <tbody>
+	                		            <tr>
+	                		              <td colspan="2">
+					            			  <div>
+					            			     <label for="supplier_id"/> <field name="supplier_id" class="oe_inline" /> <br/>
+					            			     <label for="if_etalon"/> <field name="if_etalon" class="oe_inline" /> <br/>
+					            			  </div>
+					            		  </td>
+					            		  <td rowspan="3" style="width:15%;"></td>
+					            		  <td rowspan="3">
+								                  <group>
+						                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+						                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+					                    			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+						                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+					                    			<field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}" onchange='onchange_mult_etalonic_select(etalonic_select)'/>
+					                    			<field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+					                    		  </group> 
+	
+						                		    <field name="etalonic_list" nolabel="1"  attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="2">
+						                		    	<tree>
+						                		    	    <field name="name" />
+						                		    	</tree>
+						                		    </field>
+	
+						                		    <field name="reverse_etalonic_list" nolabel="1" attrs="{'invisible':[('if_etalon', '=', False)]}" >
+						                		    	<tree>
+						                		    	    <field name="name" />
+						                		    	</tree>
+						                		    </field>
+					                	  </td>
+					            		</tr>
+
+					            		<tr>
+					            		  <td colspan="3">
+											<table>
+                                                    <tr><td><label for="brand"/></td><td><field name="brand"    /></td> <td style="width:10%;"></td> <td><field name="chkF_brand" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="model"/></td><td><field name="model"    /></td> <td style="width:10%;"></td> <td><field name="chkF_model" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="wrsize"/></td><td><field name="wrsize"  /></td> <td style="width:10%;"></td> <td><field name="chkF_wrsize" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="pcd"/></td><td><field name="pcd"        /></td> <td style="width:10%;"></td> <td><field name="chkF_pcd" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="dia"/></td><td><field name="dia"        /></td> <td style="width:10%;"></td> <td><field name="chkF_dia" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="et"/></td><td><field name="et"          /></td> <td style="width:10%;"></td> <td><field name="chkF_et" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="paint"/></td><td><field name="paint"    /></td> <td style="width:10%;"></td> <td><field name="chkF_paint" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                           </table>
+							              </td>
+						            	</tr>
+
+						            	<tr>
+						            	  <td colspan="3">
+						            			 <group>
+						            			     <field name="type" />
+						            			     <field name="country"  />
+					            			     </group>
+							              </td>
+
+							              
+								          
+					                	</tr>
+					                	<tr>
+					                	  <td colspan="4">
+						                		    <!-- <div>
+					    	                		    <button name="set_default_etalonic_list_domain" type="object" string="Reset filter" />
+						            		        </div>
+
+						                		    <field name="etalonic_list_domain" class="oe_right" nolabel="1" colspan="1"/> -->
+					                	    
+								                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+								                		<tree>
+								                			<field name="supplier_id"/>
+								                			<field name="quantity"/>
+								                			<field name="price"/>
+								                		</tree>
+								                	</field>
+							              </td>
+							            </tr>
+		                	</tbody>
+	                	</table>
                		</sheet>
               	</form>
          	</field> 
