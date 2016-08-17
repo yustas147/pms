@@ -68,6 +68,7 @@
                 		    <button name='create_proxy' type='object' string='Create proxy' attrs="{'invisible':[('proxy_id','!=',False)]}"/>
                 		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
                 		    <button name='update_magento_price' type='object' string='upd mag price' />
+                		    <button name='get_prox' type='object' string='get prox' />
                     </header>
                 </xpath>
                 <xpath expr="//notebook" position="inside">
@@ -137,6 +138,11 @@
 	                   <button name="parse_wpd" string="Parse wpd" type="object" attrs="{'invisible':[('tire_wpd', '!=', False)]}" class="oe_highlight"/>	
 	                   <button name="parse_wsp" string="Parse wsp" type="object" attrs="{'invisible':[('tire_wsp', '!=', False)]}" class="oe_highlight"/>	
 	                   <button name="parse_studness" string="Parse studness" type="object" attrs="{'invisible':[('tire_studness', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_season" string="Parse season" type="object" attrs="{'invisible':[('season', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_lg_weightness" string="Parse weightness" type="object" attrs="{'invisible':[('lg_weightness', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="parse_R" string="Parse R" type="object" attrs="{'invisible':[('R', '!=', False)]}" class="oe_highlight"/>	
+	                   <button name="get_connected_product_template" string="get_connected_product_template" type="object" />	
+		       		   <button name='setCatIdBy_lg_weightness_and_R' type='object' string='set cat by W and R' />
 	                   
 	                   <button name="autoconnect" string="autoconnect" type="object" attrs="{'invisible':[('if_etalon', '=', True)]}"/>	
 	                   <button name="conn_to_me" string="connect to me" type="object" attrs="{'invisible':[('if_etalon', '=', False)]}"/>	
@@ -155,6 +161,9 @@
 			                	<field name="tire_wsp"/>	
 			                	<field name="tire_wpd"/>	
 			                	<field name="tire_studness"/>	
+			                	<field name="season"/>	
+			                	<field name="lg_weightness"/>	
+			                	<field name="R"/>	
 	            			</group>
 	            			<group name="Supplier`s data" colspan="1">
 	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>

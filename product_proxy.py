@@ -2,7 +2,8 @@
 
 from openerp import models, fields, api, http
 #import parser
-from parser import brandParser, modelParser, wpdParser, wspParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser
+from parser import brandParser, modelParser, wpdParser, wspParser,\
+                   seasonParser, lg_weightnessParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser, RParser
 from openerp.osv import osv
 from openerp.tools.translate import _
 import logging
@@ -80,6 +81,12 @@ class product_template(models.Model):
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
     virt_stock = fields.Integer(string='Virtual stock quantity', compute='_set_virtual_stock')
 
+
+    @api.multi
+    @api.model
+    def get_prox(self):
+        _logger.info('prox_id is: '+unicode(self.proxy_id))
+        _logger.info('prox_id.id is: '+unicode(self.proxy_id.id))
     
     @api.multi
     @api.model
@@ -575,6 +582,9 @@ class virt_disk(models.Model):
             _logger.warning("########## model not found in name: "+ unicode(self.name))
         return parsed_model 
     
+    
+    
+    
     @api.multi 
     @api.model
     def parse_wrsize(self):
@@ -637,12 +647,67 @@ class virt_tire(models.Model):
     tire_wpd = fields.Char('Dimensions')
     tire_studness = fields.Selection([('n/s','Non-studded'),('studded','Studded'),('studdable','Studdable')],string='Studness')
     country = fields.Char('Country')
+    season = fields.Selection([('summer','Summer'),('winter','Winter'),('all-season','All Season')],string='Season')
+    lg_weightness = fields.Selection([('special','Special'),('agricultural','Agricultural'),('industrial','Industrial'),('4x4','4x4'),('light_car','Light car'),('truck','Truck'),('light_truck','Light truck')],string='Weightness')
+    R = fields.Char('R') 
+    
     name_unparsed = fields.Char('Left for parsing')
     etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',True)]", string = 'Select etalonic tire')
     reverse_etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',False)]", string = 'Select non-etalon tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.tire', string = 'Possible non-etalon virt tires')
 #    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
+
+
+    @api.one
+    def setCatIdBy_lg_weightness_and_R(self):
+        cpt = self.get_connected_product_template() 
+        _logger.info('cpt name: '+ unicode(cpt.name))
+        res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)
+        _logger.info('res : '+ unicode(res))
+        if res:
+            cpt.categ_id = res[0].id 
+            _logger.info('cpt.categ_id_name : '+ unicode(cpt.categ_id.name))
+            return cpt.categ_id
+        else:
+            _logger.info('category not set : not found')
+            return False
+
+
+    @api.one
+    def getCatIdBy2(self, parent_categ_name=False, categ_name=False):
+        cat_env = http.request.env['product.category']
+        res = cat_env.search([('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+        if res:
+            res = cat_env.browse([res])
+        _logger.info('result categ id: '+ unicode(res))
+        return res
+    
+#    getCatByWR = lambda self,cr,uid,parent_categ_name,categ_name: self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R) 
+
+#     @api.one    
+#     def getCatByWR(self):
+#         cat_env = http.request.env['product.category']
+#         res = cat_env.search([('parent_id.name','=',self.lg_weightness),('name','=',self.R)])
+# #        res = cat_env.search([('parent_id.name','=',self.lg_weightness),('name','=',self.R)]).mapped('id')
+#         _logger.info('result categ name: '+ unicode(res[0].name))
+#         _logger.info('result categ id: '+ unicode(res))
+        
+    
+    @api.multi
+    @api.model
+    def get_connected_product_template(self):
+        pt_env = self.env['product.template']
+        prox_id = self.proxy_id.id
+#        prox_id = self.proxy_id.id
+        _logger.info(" prox_id is: " + unicode(prox_id))
+        _logger.info(" pt_env is: " + unicode(pt_env))
+        res = pt_env.search([('proxy_id.id','=',prox_id)]).mapped('id')[0]
+        res = pt_env.browse(res)
+        _logger.info(" res is: " + unicode(res))
+        _logger.info("Found connected template, name is: " + unicode(res.name))
+        return res
+        pass
 
 
     @api.one
@@ -707,6 +772,9 @@ class virt_tire(models.Model):
         self.parse_wpd()
         self.parse_wsp()
         self.parse_studness()
+        self.parse_season()
+        self.parse_lg_weightness()
+        self.parse_R()
     
     @api.multi
     @api.model
@@ -759,6 +827,47 @@ class virt_tire(models.Model):
             _logger.warning( "########## brand not found in name: "+ unicode(self.name))
         return parsed_brand
 #        return True
+ 
+    @api.multi 
+    @api.model
+    def parse_season(self):
+        parser = seasonParser(parse_string=self.name, dict_type='tyre_season')
+        parsed_brand, name_minus_brand = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_brand :
+            self.season = parsed_brand
+            self.name_unparsed = name_minus_brand
+        else:
+            _logger.warning( "########## season not found in name: "+ unicode(self.name))
+            #self.tire_studness = 'n/s'
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_R(self):
+        parser = RParser(self.name)
+        parsed_wpd, name_minus_wpd = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_wpd :
+            self.R = parsed_wpd.upper()
+            self.name_unparsed = name_minus_wpd
+        else:
+            _logger.warning("########## R not found in name: "+ unicode(self.name))
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_lg_weightness(self):
+        parser = lg_weightnessParser(parse_string=self.name, dict_type='tyre_lg_weightness')
+        parsed_brand, name_minus_brand = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_brand :
+            self.lg_weightness = parsed_brand
+            self.name_unparsed = name_minus_brand
+        else:
+            _logger.warning( "########## lg_weightness not found in name: "+ unicode(self.name))
+            #self.tire_studness = 'n/s'
+        return True
     
     @api.multi 
     @api.model

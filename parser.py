@@ -260,6 +260,35 @@ class wspParser(wpdParser):
             #return re.sub(rx_compiled, wsp_repl, cell).split('__')
         self.res, self.res_string = wsp(self.parse_string)
         return self.res, self.parse_string
+
+class RParser(wpdParser):
+
+    def parse(self):
+        def chk(val):
+            if val:
+                return val
+            else:
+                return ''
+
+        def R_repl(matched):
+            return chk(matched.group(2))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(3))
+
+        def R(cell):
+            rx_compiled = re.compile(ur'(.*)\s?([rR]\d\d[.,]?\d?)\s(.*)', re.U)
+#            rx_compiled = re.compile(ur'(.*)\s+(\d{2,3}/)*(\d{2,3})\s*([A-Z])\s*(.*)', re.U)
+            res1 = re.sub(rx_compiled, R_repl, cell)
+            res = res1.split('__')
+            if len(res) > 1:
+                res[1] = ' '+unicode(res[1])+' '
+                return res
+            else:
+                if len(res) == 1:
+                    return (['', res[0]])
+                else:
+                    return(['', ''])
+            #return re.sub(rx_compiled, wsp_repl, cell).split('__')
+        self.res, self.res_string = R(self.parse_string)
+        return self.res, self.parse_string
             
 class wxrParser(Parser):
     def __init__(self, parse_string=False):
@@ -404,6 +433,10 @@ class studnessParser(brandParser):
 
     pass
 class paintParser(brandParser):
+    pass
+class seasonParser(brandParser):
+    pass
+class lg_weightnessParser(brandParser):
     pass
                          
                 
