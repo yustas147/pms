@@ -658,28 +658,51 @@ class virt_tire(models.Model):
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.tire', string = 'Possible non-etalon virt tires')
 #    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
 
+    @api.one
+    def set_cat2(self):
+        self.parse_lg_weightness()
+        self.parse_R()
+        self.setCatIdBy_lg_weightness_and_R()
+    
+    def set_cat2_all_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.set_cat2()
+            _logger.info( unicode(inst.name)+"  categ processed!")
 
     @api.one
     def setCatIdBy_lg_weightness_and_R(self):
         cpt = self.get_connected_product_template() 
-        _logger.info('cpt name: '+ unicode(cpt.name))
-        res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)
-        _logger.info('res : '+ unicode(res))
-        if res:
-            cpt.categ_id = res[0].id 
-            _logger.info('cpt.categ_id_name : '+ unicode(cpt.categ_id.name))
-            return cpt.categ_id
-        else:
-            _logger.info('category not set : not found')
-            return False
+        if cpt:
+            _logger.info('cpt name: '+ unicode(cpt.name))
+            res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+            _logger.info('res : '+ unicode(res))
+            if res:
+                cpt.categ_id = res 
+#                cpt.categ_id = res.id 
+                _logger.info('cpt.categ_id_name : '+ unicode(cpt.categ_id.name))
+                return cpt.categ_id
+            else:
+                _logger.info('category not set : not found')
+                return False
 
 
     @api.one
     def getCatIdBy2(self, parent_categ_name=False, categ_name=False):
+        if not (parent_categ_name and categ_name):
+            _logger.warn('Error:  possibly lg_WR or R fields not set ')
+            return False
         cat_env = http.request.env['product.category']
-        res = cat_env.search([('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
-        if res:
-            res = cat_env.browse([res])
+        try:
+            res = cat_env.search([('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+        except:
+            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
+            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
+            _logger.error('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
+            res = False
+
+        #if res:
+        #    res = cat_env.browse([res])
         _logger.info('result categ id: '+ unicode(res))
         return res
     
@@ -702,12 +725,15 @@ class virt_tire(models.Model):
 #        prox_id = self.proxy_id.id
         _logger.info(" prox_id is: " + unicode(prox_id))
         _logger.info(" pt_env is: " + unicode(pt_env))
-        res = pt_env.search([('proxy_id.id','=',prox_id)]).mapped('id')[0]
-        res = pt_env.browse(res)
-        _logger.info(" res is: " + unicode(res))
-        _logger.info("Found connected template, name is: " + unicode(res.name))
-        return res
-        pass
+        res = pt_env.search([('proxy_id.id','=',prox_id)]).mapped('id')
+#        res = pt_env.search([('proxy_id.id','=',prox_id)]).mapped('id')[0]
+        if len(res):
+            res = pt_env.browse(res[0])
+            _logger.info(" res is: " + unicode(res))
+            return res
+        else:
+            return False
+   #     _logger.info("Found connected template, name is: " + unicode(res.name))
 
 
     @api.one
