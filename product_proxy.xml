@@ -151,48 +151,89 @@
 	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
 				    </header>
                		<sheet>
-               		    <group>
-	            			<group name="Common data" colspan="1">
-	                			<field name="name"/>
-		                		<field name="supplier_id"  />
-		                		<field name="if_etalon"  />
-			                	<field name="tire_brand"/>	
-			                	<field name="tire_model"/>	
-			                	<field name="tire_wsp"/>	
-			                	<field name="tire_wpd"/>	
-			                	<field name="tire_studness"/>	
-			                	<field name="season"/>	
-			                	<field name="lg_weightness"/>	
-			                	<field name="R"/>	
-	            			</group>
-	            			<group name="Supplier`s data" colspan="1">
-	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-                     			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
-	                		    <label string="Possible etalons" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
-	                		    <field name="etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', True)]}">
-	                		    	<tree>
-	                		    	    <field name="name" />
-	                		    	</tree>
-	                		    </field>
-	                		    <label string="Possible non-etalons" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
-	                		    <field name="reverse_etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', False)]}" >
-	                		    	<tree>
-	                		    	    <field name="name" />
-	                		    	</tree>
-	                		    </field>
-	                	    </group>	
-                	    </group>
-	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
-	                		<tree>
-	                			<field name="supplier_id"/>
-	                			<field name="quantity"/>
-	                			<field name="price"/>
-	                		</tree>
-	                	</field>
+	                	<table>
+	                		        <thead>
+            	                		<h1>	<field name="name" nolabel="1" class="oe_center"/></h1>
+	                		        </thead>
+	                		        <tbody>
+	                		            <tr>
+	                		              <td colspan="2">
+					            			  <div>
+					            			     <label for="supplier_id"/> <field name="supplier_id" class="oe_inline" /> <br/>
+					            			     <label for="if_etalon"/> <field name="if_etalon" class="oe_inline" /> <br/>
+					            			  </div>
+					            		  </td>
+					            		  <td rowspan="3" style="width:15%;"></td>
+					            		  <td rowspan="3">
+								                  <group>
+						                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+						                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+					                    			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+						                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+					                    			<field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}" onchange='onchange_mult_etalonic_select(etalonic_select)'/>
+					                    			<field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+					                    		  </group> 
+	
+						                		    <field name="etalonic_list" nolabel="1"  attrs="{'invisible':[('if_etalon', '=', True)]}" colspan="2">
+						                		    	<tree>
+						                		    	    <field name="name" />
+						                		    	</tree>
+						                		    </field>
+	
+						                		    <field name="reverse_etalonic_list" nolabel="1" attrs="{'invisible':[('if_etalon', '=', False)]}" >
+						                		    	<tree>
+						                		    	    <field name="name" />
+						                		    	</tree>
+						                		    </field>
+					                	  </td>
+					            		</tr>
+
+					            		<tr>
+					            		  <td colspan="3">
+											<table>
+                                                    <tr><td><label for="tire_brand"/></td>   <td><field name="tire_brand"/></td>   <td style="width:10%;"></td> <td><field name="chkF_tire_brand" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="tire_model"/></td>   <td><field name="tire_model"/></td>   <td style="width:10%;"></td> <td><field name="chkF_tire_model" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="tire_wsp"/></td>     <td><field name="tire_wsp"/></td>     <td style="width:10%;"></td> <td><field name="chkF_tire_wsp" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="tire_wpd"/></td>     <td><field name="tire_wpd"/></td>     <td style="width:10%;"></td> <td><field name="chkF_tire_wpd" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="tire_studness"/></td>     <td><field name="tire_studness"/></td>     <td style="width:10%;"></td> <td><field name="chkF_tire_studness" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="lg_weightness"/></td><td><field name="lg_weightness"/></td><td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
+                                                    
+                                                    
+                                                    
+                                                    
+                                                    <tr><td><label for="R"/></td>            <td><field name="R"/></td>            <td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="season"/></td>       <td><field name="season"/></td>       <td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
+                                           </table>
+							              </td>
+						            	</tr>
+
+						            	<tr>
+						            	  <td colspan="3">
+						            			 <group>
+						            			     <field name="country"  />
+					            			     </group>
+							              </td>
+
+							              
+								          
+					                	</tr>
+					                	<tr>
+					                	  <td colspan="4">
+					                	    
+								                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+								                		<tree>
+								                			<field name="supplier_id"/>
+								                			<field name="quantity"/>
+								                			<field name="price"/>
+								                		</tree>
+								                	</field>
+							              </td>
+							            </tr>
+		                	</tbody>
+	                	</table>
+	                	
+	                	
+	                	
                		</sheet>
               	</form>
          	</field> 
@@ -491,3 +532,46 @@
        </record>  
 	</data>
 </openerp>          
+
+ 		    <!-- <group>
+	            			<group name="Common data" colspan="1">
+	                			<field name="name"/>
+		                		<field name="supplier_id"  />
+		                		<field name="if_etalon"  />
+			                	<field name="tire_brand"/>	
+			                	<field name="tire_model"/>	
+			                	<field name="tire_wsp"/>	
+			                	<field name="tire_wpd"/>	
+			                	<field name="tire_studness"/>	
+			                	<field name="season"/>	
+			                	<field name="lg_weightness"/>	
+			                	<field name="R"/>	
+	            			</group>
+	            			<group name="Supplier`s data" colspan="1">
+	                		    <field name="quantity" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="price" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+                     			<field name="default_code" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalon_id" domain="[('if_etalon','=',True)]"  attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalonic_select" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="reverse_etalonic_select" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+	                		    <label string="Possible etalons" attrs="{'invisible':[('if_etalon', '=', True)]}"/>
+	                		    <field name="etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', True)]}">
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
+	                		    <label string="Possible non-etalons" attrs="{'invisible':[('if_etalon', '=', False)]}"/>
+	                		    <field name="reverse_etalonic_list" nolabel="1" colspan="2" attrs="{'invisible':[('if_etalon', '=', False)]}" >
+	                		    	<tree>
+	                		    	    <field name="name" />
+	                		    	</tree>
+	                		    </field>
+	                	    </group>	
+                	    </group>
+	                	<field name="proxy_ids" attrs="{'invisible':[('if_etalon', '=', False)]}">
+	                		<tree>
+	                			<field name="supplier_id"/>
+	                			<field name="quantity"/>
+	                			<field name="price"/>
+	                		</tree>
+	                	</field> -->

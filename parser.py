@@ -336,22 +336,8 @@ class pcdParser(Parser):
             return (matched.group(2)+'x'+matched.group(4)+'__'+ matched.group(1)+' '+matched.group(5)) 
 
         def wxr(cell):
-#             rx_compiled = re.compile(ur'(.*\s)([3-9]{1})([/\s,x,\\]{1})(\d{2,3}[\.,]?\d?)(.*)', re.U)    
-# #            rx_compiled = re.compile(ur'(.*\s)(\d{1}[\./,]?\d?)([\s,x,\\]{1})(\d{2}\s+)(.*)', re.U)    
-#             res1 = re.sub(rx_compiled, wxr_repl, cell)
-#             res = res1.split('__')
-#             if len(res) > 1:
-#         #    if len(res) > 0:
-#                 return res
-#             else:
-#                 if len(res) == 1:
-#                     return (['', res[0]])
-#                 else:
-#                     return(['', ''])
-        
-            #re_list = [ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
-            re_list = [ur'(.*\s)([3-9])([x,х,\\])(\d{3}[\.,]?\d?)(.*)',ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)']
-#            re_list = [ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)']
+            re_list = [ur'(.*\s)([3-9])([x,х,\*,\\])(\d{3}[\.,]?\d?)(.*)',ur'(.*\s)([3-9])([/\s,x,х,\*,\\])(\d{2,3}[\.,]?\d?)(.*)']
+#            re_list = [ur'(.*\s)([3-9])([x,х,\\])(\d{3}[\.,]?\d?)(.*)',ur'(.*\s)([3-9])([/\s,x,х,\\])(\d{2,3}[\.,]?\d?)(.*)']
             for regxp in re_list:
                 rx_compiled = re.compile(regxp, re.U)    
                 res1 = re.sub(rx_compiled, wxr_repl, cell)

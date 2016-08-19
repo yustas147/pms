@@ -654,9 +654,109 @@ class virt_tire(models.Model):
     name_unparsed = fields.Char('Left for parsing')
     etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',True)]", string = 'Select etalonic tire')
     reverse_etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',False)]", string = 'Select non-etalon tire')
-    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
-    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids', comodel_name='virt.tire', string = 'Possible non-etalon virt tires')
+    etalonic_list = fields.One2many(compute='_get_etalonic_ids2', comodel_name='virt.tire', string = 'Possible etalon virt tires')
+    reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids2', comodel_name='virt.tire', string = 'Possible non-etalon virt tires')
 #    etalonic_list = fields.One2many(compute='_get_etalonic_ids', comodel_name='virt.tire', string = 'Possible etalon virt tires')
+    chkF_tire_brand = fields.Boolean("Brand")
+    chkF_tire_model = fields.Boolean("Model")
+    chkF_tire_wsp = fields.Boolean("WSP")
+    chkF_tire_wpd = fields.Boolean("WPD")
+    chkF_tire_studness = fields.Boolean("Studness")
+    
+    #smart selector
+    @api.one
+    def get_chkF(self):
+        res = []
+        res_def = []
+        for fld in self.fields_get_keys():
+            if 'chkF' in fld:
+                print fld
+                fval = eval('self.'+fld)
+                res_def.append(fld[5:])
+                if fval:
+                    res.append(fld[5:])
+        print 'res: '+unicode(res)
+        print 'res_def :'+unicode(res_def)
+        if len(res) > 0:
+            return res
+        return res_def
+
+
+    @api.one
+    @api.depends('chkF_tire_brand','chkF_tire_model','chkF_tire_wsp','chkF_tire_wpd','chkF_tire_studness')
+    def _get_etalonic_ids2(self):
+        if self.if_etalon:
+            return []
+        domlist = self.get_chkF()[0]
+        print 'domlist: '+unicode(domlist)
+        dyndom_lst = ["('if_etalon', '=', True)"] 
+        et_rset=False
+        for fld in domlist:
+            print "fld : "+unicode(fld)
+ #           spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+            print 'self.fld: '+unicode(eval('self.'+fld))
+            spar = '('+ "'"+fld+"'" +","+ "'='" +","+ 'self.'+fld + ')'
+            _logger.info("spar is:"+unicode(spar))
+            dyndom_lst.append(spar)
+        dyndom_str = ",".join(dyndom_lst)
+        print 'dyndom_str: '+unicode(dyndom_str)
+        try:
+            et_rset = self.search([i for i in eval(dyndom_str)])
+        except:
+            _logger.error("search error: "+unicode(dyndom_str))
+        self.etalonic_list = et_rset
+        
+    @api.one
+    @api.depends('chkF_tire_brand','chkF_tire_model','chkF_tire_wsp','chkF_tire_wpd','chkF_tire_studness')
+    def _get_reverse_etalonic_ids2(self):
+        if not self.if_etalon:
+            return []
+        domlist = self.get_chkF()[0]
+        print 'domlist: '+unicode(domlist)
+        dyndom_lst = ["('if_etalon', '=', False)"] 
+        et_rset=False
+        for fld in domlist:
+            print "fld : "+unicode(fld)
+ #           spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
+            print 'self.fld: '+unicode(eval('self.'+fld))
+            spar = '('+ "'"+fld+"'" +","+ "'='" +","+ 'self.'+fld + ')'
+            _logger.info("spar is:"+unicode(spar))
+            dyndom_lst.append(spar)
+        dyndom_str = ",".join(dyndom_lst)
+        print 'dyndom_str: '+unicode(dyndom_str)
+        try:
+            et_rset = self.search([i for i in eval(dyndom_str)])
+        except:
+            _logger.error("search error: "+unicode(dyndom_str))
+        self.reverse_etalonic_list = et_rset
+        
+        
+#    @api.onchange('etalonic_list')
+    @api.onchange('chkF_tire_brand','chkF_tire_model','chkF_tire_wsp','chkF_tire_wpd','chkF_tire_studness')
+    def onchange_mult_etalonic_select(self):
+
+#         def check_cur_state(self,f_list):
+#             res = True
+#             v_list = [eval('self.'+x) for x in f_list]
+#             return res
+        
+        #flist = ['etalonic_select']
+        
+        #check_cur_state(self,flist)
+        res = {}
+        res['domain'] = { 'etalonic_select':[] }
+        res['domain']['etalonic_select'].append(('id','in', self.etalonic_list.mapped('id')))
+#        res['domain'] = { x:[] for x in flist }
+#        res['value'] = {}
+        print "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU: "+unicode(res)
+        return res
+    
+    
+    
+    
+    
+    
+    #/smart selector
 
     @api.one
     def set_cat2(self):
