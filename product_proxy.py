@@ -82,6 +82,22 @@ class product_template(models.Model):
     virt_stock = fields.Integer(string='Virtual stock quantity', compute='_set_virtual_stock')
 
 
+    @api.one
+    @api.model
+    def set_tyre_cat(self):
+        virt_pool = http.request.env['virt.tire']
+        vt =  virt_pool.search([('proxy_id','=',self.proxy_id.id)])[0]
+        vt.set_cat2()
+    
+    def set_tyre_cat_all_sel_ids(self,cr,uid,ids,context=False):
+         for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.set_tyre_cat()
+            _logger.info( unicode(inst.name)+"  categ processed by set_tyre_cat!")
+
+
+
+
     @api.multi
     @api.model
     def get_prox(self):
