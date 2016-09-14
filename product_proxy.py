@@ -100,18 +100,30 @@ class product_template(models.Model):
         return res
 
     
-    @api.multi
+    @api.one
     @api.model
     def update_magento_price(self):
         #self.list_price = self.standard_price
         pr_list = self.pricelist_id
-        res = pr_list.price_get(self.id, 1)
-        _logger.info("RESULT is: "+unicode(res))
-        self.list_price = res.values()[0]
+        #res = pr_list.price_rule_get_multi([(self,1,1)])
+        #_logger.info("price_rule_get_multi "+unicode(res))
+        res = pr_list.price_get_multi([(self,1,1)])
+#        _logger.info("price_get_multi: "+unicode(res))
+        p = [r.values() for r in res.values()]
+        res = [k for k in p[0] if k];
+        _logger.info("res: "+unicode(res))
+        if len(res) > 1:
+            _logger.error('More than one price for this '+unicode(self.name)+' product!')
+        elif len(res) == 0:
+            _logger.error('Could not determine  price for this '+unicode(self.name)+' product!')
+            return False
+        self.list_price = float(res[0])
+        return self.list_price
         
     def upd_prod_price_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
+            inst.set_lowest_lst_price()
             inst.update_magento_price()
 #            inst.update_magento_price()
             _logger.info(unicode(inst.name)+"         price updated!")
