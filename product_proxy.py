@@ -787,7 +787,8 @@ class virt_tire(models.Model):
         cpt = self.get_connected_product_template() 
         if cpt:
             _logger.info('cpt name: '+ unicode(cpt.name))
-            res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+            res = self.getCatIdBy3(parent_parent_categ_name=u'Каталог шин', parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+#            res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
             _logger.info('res : '+ unicode(res))
             if res:
                 cpt.categ_id = res 
@@ -811,6 +812,26 @@ class virt_tire(models.Model):
             #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
             #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
             _logger.error('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
+            res = False
+
+        #if res:
+        #    res = cat_env.browse([res])
+        _logger.info('result categ id: '+ unicode(res))
+        return res
+    
+    @api.one
+    def getCatIdBy3(self, parent_parent_categ_name=False, parent_categ_name=False, categ_name=False):
+        if not (parent_categ_name and categ_name):
+            _logger.warn('Error:  possibly lg_WR or R fields not set ')
+            return False
+        cat_env = http.request.env['product.category']
+        try:
+            res = cat_env.search([('parent_id.parent_id.name','=',parent_parent_categ_name),('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+#            res = cat_env.search([('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+        except:
+            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
+            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
+            _logger.error('Error:  category '+unicode(parent_parent_categ_name)+'/'+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
             res = False
 
         #if res:
