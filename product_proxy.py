@@ -1100,6 +1100,7 @@ class virt_tire(models.Model):
             self.name_unparsed = name_minus_wpd
             self.name_minus_wpd = name_minus_wpd
         else:
+            self.name_minus_wpd = self.name
             _logger.warning("########## wpd not found in name: "+ unicode(self.name))
         return True
 

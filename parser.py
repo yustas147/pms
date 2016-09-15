@@ -3,6 +3,8 @@
 from openerp import models, fields, api, http
 import re, logging
 
+_logger = logging.getLogger('PMS')
+
 #changes symb_a by symb_b in string
 def ch_symb(strng, symb_a, symb_b):
     if symb_a in strng:
@@ -208,31 +210,93 @@ class brandParser(Parser):
                 pass
         return self.res, self.parse_string
 
+# class wpdParser_(Parser):
+#     def __init__(self, parse_string=False):
+#         super(wpdParser,self).__init__(parse_string=parse_string)
+#     def parse(self):
+#         #self.get_parser_dict()
+#         def wpd_repl(matched):
+#             return (matched.group(2)+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
+# 
+#         def wpd(cell):
+#             rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)', re.U)    
+# #            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/](\d\d[RF|C]*)(.*)', re.U)    
+# #            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[R/](\d\d[RF|C]*)(.*)', re.U)    
+#             res1 = re.sub(rx_compiled, wpd_repl, cell)
+#             res = res1.split('__')
+#             if len(res) > 1:
+#         #    if len(res) > 0:
+#                 return res
+#             else:
+#                 if len(res) == 1:
+#                     return (['', res[0]])
+#                 else:
+#                     return(['', ''])
+#         self.res, self.res_string = wpd(self.parse_string)
+#         return self.res, self.res_string
+# #        return self.res, self.parse_string
+
 class wpdParser(Parser):
-    def __init__(self, parse_string=False):
+    def __init__(self, parse_string=False, regexp_list=[
+                                                        ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)',
+                                                        ur'(.*)(\d{2})/(\d\d?[\.,]?\d?)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)',
+                                                        ur'(.*)(\d\d)/(\d\d\.\d)R(\d\d)(.*)'
+                                                        ]):
         super(wpdParser,self).__init__(parse_string=parse_string)
+        self.regexp_list = regexp_list
     def parse(self):
         #self.get_parser_dict()
-        def wpd_repl(matched):
+        def _repl(matched):
+#        def wpd_repl(matched):
             return (matched.group(2)+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
-
-        def wpd(cell):
-            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)', re.U)    
-#            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/](\d\d[RF|C]*)(.*)', re.U)    
-#            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[R/](\d\d[RF|C]*)(.*)', re.U)    
-            res1 = re.sub(rx_compiled, wpd_repl, cell)
-            res = res1.split('__')
-            if len(res) > 1:
-        #    if len(res) > 0:
-                return res
+        
+        
+        def finder(cell):
+            #re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)', 
+            #           ur'(.*\s)([1-2]\d)([x,х])(\d[\.,][0,5])(.*)',ur'(.*\s)([1-2]\d)([x,х])(\d)(.*)']
+            re_list = self.regexp_list
+            for regxp in re_list:
+                rx_compiled = re.compile(regxp, re.U)    
+                res1 = re.sub(rx_compiled, _repl, cell)
+                _logger.info('res1: '+unicode(res1))
+                res = res1.split('__')
+                _logger.info('res: '+unicode(res))
+                if len(res) > 1:
+                    return res
+            if len(res) == 1: 
+                return (['', res[0]])
             else:
-                if len(res) == 1:
-                    return (['', res[0]])
-                else:
-                    return(['', ''])
-        self.res, self.res_string = wpd(self.parse_string)
-        return self.res, self.res_string
-#        return self.res, self.parse_string
+                return(['', ''])
+        self.res, self.res_string = finder(self.parse_string)
+        return self.res, self.parse_string
+    
+# 
+#         def wpd_(cell):
+#             rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)', re.U)    
+# #            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/](\d\d[RF|C]*)(.*)', re.U)    
+# #            rx_compiled = re.compile(ur'(.*)(\d{3})/(\d\d)\s*[R/](\d\d[RF|C]*)(.*)', re.U)    
+#             res1 = re.sub(rx_compiled, _repl, cell)
+# #            res1 = re.sub(rx_compiled, wpd_repl, cell)
+#             res = res1.split('__')
+#             if len(res) > 1:
+#         #    if len(res) > 0:
+#                 return res
+#             else:
+#                 if len(res) == 1:
+#                     return (['', res[0]])
+#                 else:
+#                     return(['', ''])
+#         self.res, self.res_string = wpd(self.parse_string)
+#         return self.res, self.res_string
+#     
+        
+       
+    
+    
+    
+    
+    
+    
 
 class wspParser(Parser):
 #class wspParser(wpdParser):
@@ -246,12 +310,13 @@ class wspParser(Parser):
             else:
                 return ''
 
-        def wsp_repl(matched):
+        def _repl(matched):
+#        def wsp_repl(matched):
             return chk(matched.group(2))+chk(matched.group(3))+chk(matched.group(4))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(5))
 
-        def wsp(cell):
+        def finder(cell):
             rx_compiled = re.compile(ur'(.*)\s+(\d{2,3}/)*(\d{2,3})\s*([A-Z])\s*(.*)', re.U)
-            res1 = re.sub(rx_compiled, wsp_repl, cell)
+            res1 = re.sub(rx_compiled, _repl, cell)
             res = res1.split('__')
             if len(res) > 1:
                 res[1] = ' '+unicode(res[1])+' '
@@ -262,7 +327,7 @@ class wspParser(Parser):
                 else:
                     return(['', ''])
             #return re.sub(rx_compiled, wsp_repl, cell).split('__')
-        self.res, self.res_string = wsp(self.parse_string)
+        self.res, self.res_string = finder(self.parse_string)
 #        self.res, self.res_string = wsp(self.parse_string)
         return self.res, self.parse_string
 
