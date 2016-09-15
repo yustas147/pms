@@ -268,7 +268,7 @@ class wpdParser(Parser):
             else:
                 return(['', ''])
         self.res, self.res_string = finder(self.parse_string)
-        return self.res, self.parse_string
+        return self.res, self.res_string
     
 # 
 #         def wpd_(cell):
@@ -327,6 +327,7 @@ class wspParser(Parser):
                 else:
                     return(['', ''])
             #return re.sub(rx_compiled, wsp_repl, cell).split('__')
+        _logger.info('parse_string is: '+unicode(self.parse_string))
         self.res, self.res_string = finder(self.parse_string)
 #        self.res, self.res_string = wsp(self.parse_string)
         return self.res, self.parse_string
