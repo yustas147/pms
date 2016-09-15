@@ -231,9 +231,13 @@ class wpdParser(Parser):
                 else:
                     return(['', ''])
         self.res, self.res_string = wpd(self.parse_string)
-        return self.res, self.parse_string
+        return self.res, self.res_string
+#        return self.res, self.parse_string
 
-class wspParser(wpdParser):
+class wspParser(Parser):
+#class wspParser(wpdParser):
+#    def __init__(self, parse_string=False):
+#        super(wspParser,self).__init__(parse_string=parse_string)
 
     def parse(self):
         def chk(val):
@@ -259,6 +263,7 @@ class wspParser(wpdParser):
                     return(['', ''])
             #return re.sub(rx_compiled, wsp_repl, cell).split('__')
         self.res, self.res_string = wsp(self.parse_string)
+#        self.res, self.res_string = wsp(self.parse_string)
         return self.res, self.parse_string
 
 class RParser(wpdParser):

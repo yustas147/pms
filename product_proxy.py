@@ -680,6 +680,7 @@ class virt_tire(models.Model):
     R = fields.Char('R') 
     
     name_unparsed = fields.Char('Left for parsing')
+    name_minus_wpd = fields.Char('Left for parsing after wpd for wsp correct parsing')
     etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',True)]", string = 'Select etalonic tire')
     reverse_etalonic_select = fields.Many2one('virt.tire', domain="[('tire_wpd', '=', tire_wpd),('tire_wsp', '=', tire_wsp), ('tire_brand','=',tire_brand),('tire_model','=',tire_model),('if_etalon','=',False)]", string = 'Select non-etalon tire')
     etalonic_list = fields.One2many(compute='_get_etalonic_ids2', comodel_name='virt.tire', string = 'Possible etalon virt tires')
@@ -1097,6 +1098,7 @@ class virt_tire(models.Model):
         if parsed_wpd :
             self.tire_wpd = parsed_wpd.upper()
             self.name_unparsed = name_minus_wpd
+            self.name_minus_wpd = name_minus_wpd
         else:
             _logger.warning("########## wpd not found in name: "+ unicode(self.name))
         return True
@@ -1104,12 +1106,14 @@ class virt_tire(models.Model):
     @api.multi 
     @api.model
     def parse_wsp(self):
-        parser = wspParser(self.name)
-        parsed_wpd, name_minus_wpd = parser.parse()
+        parser = wspParser(self.name_minus_wpd)
+        _logger.info('self.name_minus_wpd is: '+unicode(self.name_minus_wpd))
+#        parser = wspParser(self.name)
+        parsed_wsp, name_minus_wsp= parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
-        if parsed_wpd :
-            self.tire_wsp = parsed_wpd.upper()
-            self.name_unparsed = name_minus_wpd
+        if parsed_wsp :
+            self.tire_wsp = parsed_wsp.upper()
+            self.name_unparsed = name_minus_wsp
         else:
             _logger.warning( "########## wsp not found in name: "+ unicode(self.name))
         return True
