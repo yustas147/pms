@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import models, fields, api, http
+from openerp import models, fields, api, http, tools
 #import parser
 from parser import brandParser, modelParser, wpdParser, wspParser,\
                    seasonParser, lg_weightnessParser, studnessParser, wxrParser, pcdParser, diaParser, etParser, paintParser, RParser
@@ -80,8 +80,68 @@ class product_template(models.Model):
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
     virt_stock = fields.Integer(string='Virtual stock quantity', compute='_set_virtual_stock')
+    pms_categ_id = fields.Many2one('product.category', string="Category for calculating list_price to be exported to magento")
+    pms_pricelist_item_id = fields.Many2one('product.pricelist.item', compute='_get_pmsPpi')
 
+    @api.model
+    @api.depends('pms_categ_id')
+    def _get_pmsPpi(self):
+        ppi_pool = self.env['product.pricelist.item']
+        if not self.pms_categ_id:
+            return False
+        ppi_items = ppi_pool.search([('categ_id','=',self.pms_categ_id.id),('price_version_id.active','=',True)])
+        _logger.info('ppi_items: '+unicode(ppi_items))
+        for ppi_item in ppi_items:
+            _logger.info('#### Got PPI for product '+unicode(self.name)+' ---------------- '+unicode(ppi_item.name)+' pricelist '+unicode(ppi_item.price_version_id.name))
+            #if ppi_item.
+        if len(ppi_items)>0:
+            self.pms_pricelist_item_id = ppi_items[0]
+            return self.pms_pricelist_item_id
+        return False
+    
+    @api.multi
+    def get_pmsPrice(self):
+        product_uom_obj = self.env['product.uom']
+        if not self.pms_pricelist_item_id:
+            return False
+        ppi_pool = self.env['product.pricelist.item']
+        _logger.info('ppi_pool: '+unicode(ppi_pool))
+        rule = ppi_pool.browse(self.pms_pricelist_item_id.id)
+        price = self.standard_price
+        _logger.info('passed rule assignment: '+unicode(rule))
+        qty_uom_id = self.uom_id.id
+        price_uom_id = qty_uom_id
+        
+        if price is not False:
+                    price_limit = price
+                    price = price * (1.0+(rule.price_discount or 0.0))
+                    if rule.price_round:
+                        price = tools.float_round(price, precision_rounding=rule.price_round)
 
+                    convert_to_price_uom = (lambda price: product_uom_obj._compute_price(self.uom_id.id,price, price_uom_id))
+                    if rule.price_surcharge:
+                        price_surcharge = convert_to_price_uom(rule.price_surcharge)
+#                        price_surcharge = rule.price_surcharge
+                        price += price_surcharge
+
+                    if rule.price_min_margin:
+                        price_min_margin = convert_to_price_uom(rule.price_min_margin)
+#                        price_min_margin = rule.price_min_margin
+                        price = max(price, price_limit + price_min_margin)
+
+                    if rule.price_max_margin:
+                        price_max_margin = convert_to_price_uom(rule.price_max_margin)
+#                        price_max_margin = rule.price_max_margin
+                        price = min(price, price_limit + price_max_margin)
+
+#                    rule_id = rule.id
+        _logger.info('Calculated pms price is: '+unicode(price))
+        self.list_price = price
+        return price   
+        
+    
+    
+    
     @api.one
     @api.model
     def set_tyre_cat(self):
@@ -119,22 +179,19 @@ class product_template(models.Model):
     @api.one
     @api.model
     def update_magento_price(self):
-        #self.list_price = self.standard_price
-        pr_list = self.pricelist_id
-        #res = pr_list.price_rule_get_multi([(self,1,1)])
-        #_logger.info("price_rule_get_multi "+unicode(res))
-        res = pr_list.price_get_multi([(self,1,1)])
-#        _logger.info("price_get_multi: "+unicode(res))
-        p = [r.values() for r in res.values()]
-        res = [k for k in p[0] if k];
-        _logger.info("res: "+unicode(res))
-        if len(res) > 1:
-            _logger.error('More than one price for this '+unicode(self.name)+' product!')
-        elif len(res) == 0:
-            _logger.error('Could not determine  price for this '+unicode(self.name)+' product!')
-            return False
-        self.list_price = float(res[0])
-        return self.list_price
+
+        #pr_list = self.pricelist_id
+        #res = pr_list.price_get_multi([(self,1,1)])
+        #p = [r.values() for r in res.values()]
+        #res = [k for k in p[0] if k];
+#         _logger.info("res: "+unicode(res))
+#         if len(res) > 1:
+#             _logger.error('More than one price for this '+unicode(self.name)+' product!')
+#         elif len(res) == 0:
+#             _logger.error('Could not determine  price for this '+unicode(self.name)+' product!')
+#             return False
+#         self.list_price = float(res[0])
+        return self.get_pmsPrice()
         
     def upd_prod_price_sel_ids(self, cr, uid, ids, context=False):
         for instid in ids:
@@ -808,10 +865,13 @@ class virt_tire(models.Model):
 #            res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
             _logger.info('res : '+ unicode(res))
             if res:
-                cpt.categ_id = res 
+                cpt.pms_categ_id = res 
+#               cpt.categ_id = res 
 #                cpt.categ_id = res.id 
-                _logger.info('cpt.categ_id_name : '+ unicode(cpt.categ_id.name))
-                return cpt.categ_id
+                _logger.info('cpt.pms_categ_id_name : '+ unicode(cpt.pms_categ_id.name))
+#                _logger.info('cpt.categ_id_name : '+ unicode(cpt.categ_id.name))
+                return cpt.pms_categ_id
+#                return cpt.categ_id
             else:
                 _logger.info('category not set : not found')
                 return False

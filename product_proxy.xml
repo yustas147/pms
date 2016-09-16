@@ -69,6 +69,7 @@
                 		    <button name='set_lowest_lst_price' type='object' string='Set lowest price' attrs="{'invisible':[('proxy_id','=',False)]}"/>
                 		    <button name='update_magento_price' type='object' string='upd mag price' />
                 		    <button name='get_prox' type='object' string='get prox' />
+                		    <button name='get_pmsPrice' type='object' string='getPmsPrice' />
                     </header>
                 </xpath>
                 <xpath expr="//notebook" position="inside">
@@ -77,6 +78,8 @@
                 			<field name="virtual_type"/>
                 			<field name="proxy_id"/>
                 			<field name="virt_stock"/>
+                			<field name="pms_categ_id"/>
+                			<field name="pms_pricelist_item_id"/>
                 		</group>
                 			<field name="proxy_ids">
                 			    <tree>

@@ -245,15 +245,11 @@ class wpdParser(Parser):
         super(wpdParser,self).__init__(parse_string=parse_string)
         self.regexp_list = regexp_list
     def parse(self):
-        #self.get_parser_dict()
         def _repl(matched):
-#        def wpd_repl(matched):
             return (matched.group(2)+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
         
         
         def finder(cell):
-            #re_list = [ur'(.*\s)(\d[\./,]?\d?)([\s,x,х,\\])([1-2]\d\s+)(.*)', ur'(.*\s)(1\d[\.,]\d)([/\s,x,х,\\])([1-2]\d)(.*)', 
-            #           ur'(.*\s)([1-2]\d)([x,х])(\d[\.,][0,5])(.*)',ur'(.*\s)([1-2]\d)([x,х])(\d)(.*)']
             re_list = self.regexp_list
             for regxp in re_list:
                 rx_compiled = re.compile(regxp, re.U)    
@@ -290,14 +286,6 @@ class wpdParser(Parser):
 #         return self.res, self.res_string
 #     
         
-       
-    
-    
-    
-    
-    
-    
-
 class wspParser(Parser):
 #class wspParser(wpdParser):
 #    def __init__(self, parse_string=False):
