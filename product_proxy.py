@@ -83,7 +83,7 @@ class product_template(models.Model):
     pms_categ_id = fields.Many2one('product.category', string="Category for calculating list_price to be exported to magento")
     pms_pricelist_item_id = fields.Many2one('product.pricelist.item', compute='_get_pmsPpi')
 
-    @api.model
+    @api.multi
     @api.depends('pms_categ_id')
     def _get_pmsPpi(self):
         ppi_pool = self.env['product.pricelist.item']
