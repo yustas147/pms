@@ -35,6 +35,8 @@
                 			<field name="price"/>
                 		</tree>
                 	</field>
+                	<field name="virt_tire_ids"/>
+                	<field name="virt_disk_ids"/>
 
                    </sheet>
                 </form>

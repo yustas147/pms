@@ -29,7 +29,23 @@ class product_proxy(models.Model):
     proxy_ids = fields.One2many('product.proxy', 'etalon_id', string='Supplier`s info')
     uid_spl = fields.Char(string='Unique identifier of price list position', help='Usually, supp_price_list_name+suppliers article the thing')
     default_code = fields.Char('Code in pricelist', help='must be unique inside price list')
+    virt_tire_ids = fields.One2many('virt.tire','proxy_id',string = "virt tire ids")
+    virt_disk_ids = fields.One2many('virt.disk','proxy_id',string = "virt disk ids")
     
+    
+    
+#     @api.multi
+#     @api.model
+#     def kill_no_virt(self):
+#         sid = self.id
+#         tire_env = http.request.env['virt.tire']
+#         disk_env = http.request.env['virt.disk']
+#         virt = tire_env.search([('proxy_id.id','=',sid)])
+#         virtd = tire_env.search([('proxy_id.id','=',sid)])
+#         _logger.info('found virt id: '+unicode(virt))
+#         if not len(virt):
+#             self.unlink()
+#     
     @api.multi
     @api.model
     def get_lower_price(self):
@@ -102,7 +118,6 @@ class product_template(models.Model):
     @api.multi
     def get_pmsPrice(self):
         product_uom_obj = self.env['product.uom']
-        _logger.info('self.pms_pricelist_id: '+unicode(self.pms_pricelist_id))
         if not self.pms_pricelist_item_id:
             return False
         ppi_pool = self.env['product.pricelist.item']
