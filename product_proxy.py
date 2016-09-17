@@ -83,7 +83,7 @@ class product_template(models.Model):
     pms_categ_id = fields.Many2one('product.category', string="Category for calculating list_price to be exported to magento")
     pms_pricelist_item_id = fields.Many2one('product.pricelist.item', compute='_get_pmsPpi')
 
-    @api.multi
+    @api.one
     @api.depends('pms_categ_id')
     def _get_pmsPpi(self):
         ppi_pool = self.env['product.pricelist.item']
@@ -102,6 +102,7 @@ class product_template(models.Model):
     @api.multi
     def get_pmsPrice(self):
         product_uom_obj = self.env['product.uom']
+        _logger.info('self.pms_pricelist_id: '+unicode(self.pms_pricelist_id))
         if not self.pms_pricelist_item_id:
             return False
         ppi_pool = self.env['product.pricelist.item']
@@ -150,7 +151,7 @@ class product_template(models.Model):
         vt.set_cat2()
     
     def set_tyre_cat_all_sel_ids(self,cr,uid,ids,context=False):
-         for instid in ids:
+        for instid in ids:
             inst = self.browse(cr, uid, [instid])[0]
             inst.set_tyre_cat()
             _logger.info( unicode(inst.name)+"  categ processed by set_tyre_cat!")
@@ -350,7 +351,10 @@ class virt_disk(models.Model):
                                                                             
     
     
-                    
+    @api.multi
+    def unlink(self):
+        self.proxy_id.unlink()
+        return super(virt_disk, self).unlink()           
 
     
     @api.one
@@ -748,6 +752,12 @@ class virt_tire(models.Model):
     chkF_tire_wsp = fields.Boolean("WSP")
     chkF_tire_wpd = fields.Boolean("WPD")
     chkF_tire_studness = fields.Boolean("Studness")
+    
+    
+    @api.multi
+    def unlink(self):
+        self.proxy_id.unlink()
+        return super(virt_tire, self).unlink()
     
     #smart selector
     @api.one
