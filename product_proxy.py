@@ -151,8 +151,10 @@ class product_template(models.Model):
                         price = min(price, price_limit + price_max_margin)
 
 #                    rule_id = rule.id
-        _logger.info('Calculated pms price is: '+unicode(price))
-        self.list_price = price
+        if abs(self.list_price - price) > 0.5:
+            _logger.info('New calculated pms price is: '+unicode(price)+' . price change is '+unicode(price - self.list_price))
+            self.list_price = price
+            return price
         return price   
         
     
