@@ -95,7 +95,7 @@ class product_template(models.Model):
     proxy_id = fields.Many2one('product.proxy', domain="[('if_etalon', '=', True)]")
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
-    virt_stock = fields.Integer(string='Virtual stock quantity', compute='_set_virtual_stock')
+    virt_stock = fields.Float(string='Virtual stock quantity', compute='_set_virtual_stock')
     pms_categ_id = fields.Many2one('product.category', string="Category for calculating list_price to be exported to magento")
     pms_pricelist_item_id = fields.Many2one('product.pricelist.item', compute='_get_pmsPpi')
 
