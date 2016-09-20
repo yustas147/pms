@@ -95,7 +95,8 @@ class product_template(models.Model):
     proxy_id = fields.Many2one('product.proxy', domain="[('if_etalon', '=', True)]")
     proxy_ids = fields.One2many(related='proxy_id.proxy_ids')
     virtual_type = fields.Selection([('virt.tire','AutoTire'), ('virt.disk','AutoDisk')], string='Select product type' )
-    virt_stock = fields.Float(string='Virtual stock quantity', compute='_set_virtual_stock')
+    virt_stock = fields.Float(string='Virtual stock quantity')
+#    virt_stock = fields.Float(string='Virtual stock quantity', compute='_set_virtual_stock')
     pms_categ_id = fields.Many2one('product.category', string="Category for calculating list_price to be exported to magento")
     pms_pricelist_item_id = fields.Many2one('product.pricelist.item', compute='_get_pmsPpi')
 
@@ -184,7 +185,7 @@ class product_template(models.Model):
     
     @api.multi
     @api.model
-    def _set_virtual_stock(self):
+    def set_virtual_stock(self):
         _logger.info('proxy_ids are: '+unicode(self.proxy_ids))
         res = 0
         for prx in self.proxy_ids:
@@ -216,6 +217,7 @@ class product_template(models.Model):
             inst = self.browse(cr, uid, [instid])[0]
             inst.set_lowest_lst_price()
             inst.update_magento_price()
+            inst.set_virtual_stock()
         
 
         
