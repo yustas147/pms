@@ -1110,7 +1110,8 @@ class virt_tire(models.Model):
     @api.multi 
     @api.model
     def parse_R(self):
-        parser = RParser(self.name)
+        parser = RParser(self.tire_wpd)
+#        parser = RParser(self.name)
         parsed_wpd, name_minus_wpd = parser.parse()
 #        parsed_brand, name_minus_brand = parser.parse(self.name)
         if parsed_wpd :

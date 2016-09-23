@@ -23,6 +23,14 @@ def add_dot_null(strng):
         res=strng.strip()+'.0'
     return res
 
+def rm_tr_null(s):
+    while len(s)>0:
+        if s[-1] == '0':
+            s = s[:-1]
+        else:
+            break
+    return s
+
 #changes string on string with prefix
 def prefstr(strng, pref):
     return unicode(pref)+unicode(strng)
@@ -238,15 +246,30 @@ class brandParser(Parser):
 
 class wpdParser(Parser):
     def __init__(self, parse_string=False, regexp_list=[
+                                                        ur'(.*?)(\d\d\d?[.,]?\d\d?d?)/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[.,]?\d?\d?)\s?(.*)',
+                                                        ur'(.*)(\d\d[\.,]\d)/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)',
                                                         ur'(.*)(\d{3})/(\d\d)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)',
                                                         ur'(.*)(\d{2})/(\d\d?[\.,]?\d?)\s*[zZ]*[rR/]\s?(\d\d[RF|C]*)(.*)',
-                                                        ur'(.*)(\d\d)/(\d\d\.\d)R(\d\d)(.*)'
+                                                        ur'(.*)(\d\d)/(\d\d\.\d)R(\d\d)(.*)',
                                                         ]):
         super(wpdParser,self).__init__(parse_string=parse_string)
         self.regexp_list = regexp_list
     def parse(self):
         def _repl(matched):
-            return (matched.group(2)+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
+            mg2 = matched.group(2)
+            for dvd in ['.',',']:
+                if dvd in mg2:
+                    d1, d2 = mg2.split(dvd)
+                    if len(d2)>0:
+                        d2 = rm_tr_null(d2)
+                    if len(d2) > 0:
+                        mg2 = '.'.join([d1,d2])
+                    else:
+                        mg2 = d1
+                    break
+                    
+
+            return (mg2+'/'+matched.group(3)+'r'+matched.group(4)).lower()+'__'+ matched.group(1)+' '+matched.group(5) 
         
         
         def finder(cell):
@@ -303,7 +326,8 @@ class wspParser(Parser):
             return chk(matched.group(2))+chk(matched.group(3))+chk(matched.group(4))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(5))
 
         def finder(cell):
-            rx_compiled = re.compile(ur'(.*)\s+(\d{2,3}/)*(\d{2,3})\s*([A-Z])\s*(.*)', re.U)
+            rx_compiled = re.compile(ur'(.*?)\s+(\d{2,3}/)*?(\d{2,3})\s*([JKLMNPQRSTHVWYZ]R?)\s*(.*)', re.U)
+#            rx_compiled = re.compile(ur'(.*?)\s+(\d{2,3}/)*(\d{2,3})\s*([JKLMNPQRSTHVWYZ]R?)\s*(.*)', re.U)
             res1 = re.sub(rx_compiled, _repl, cell)
             res = res1.split('__')
             if len(res) > 1:
@@ -333,7 +357,7 @@ class RParser(wpdParser):
             return chk(matched.group(2))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(3))
 
         def R(cell):
-            rx_compiled = re.compile(ur'(.*)\s?([rR]\d\d[.,]?\d?)\s(.*)', re.U)
+            rx_compiled = re.compile(ur'(.*)\s?([rR]\d\d[.,]?\d?)\s*(.*)', re.U)
 #            rx_compiled = re.compile(ur'(.*)\s+(\d{2,3}/)*(\d{2,3})\s*([A-Z])\s*(.*)', re.U)
             res1 = re.sub(rx_compiled, R_repl, cell)
             res = res1.split('__')

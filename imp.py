@@ -341,7 +341,10 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
 #    product_pool = pool.get('product.product')
     uid = 1
     datas = []
+    nullify_ids_list = []
     supplier = inst.name
+    exist_ids_list = product_pool.search(cr,uid,[('supplier_id','=', supplier.id)])
+    updated_ids_list = []
 
     config_ids = pool.get('imp.config').search(cr,1,[])
     config = pool.get('imp.config').browse(cr,1,config_ids)[0]
@@ -424,6 +427,8 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
                 datas.append(vals)
                 new_prod_count += 1
             else:
+                updated_ids_list.append(exist_id[0])
+
                 exist = product_pool.browse(cr, uid, exist_id[0])
                 product_rewrite = product_pool.write(cr, uid, exist.id,
                                          {'quantity':vals[qty_pos],
@@ -443,12 +448,21 @@ def tmp_xls_import(cr, inst, source, fields, poss, sheet_line_poss, model_nm):
 #                     if part_inf_rewrite:logger.warning("\nPartber info with ID = %s is rewrote with values:\nQTY = %s\nPRICE = %s" \
 #                                                      % (exist.price_ref,vals[qty_pos],vals[price_pos]))
                 exist_prod_count += 1
+
+    print unicode(exist_ids_list)
+    print unicode(updated_ids_list)
+    nullify_ids_list = list(set(exist_ids_list) - set(updated_ids_list))
+    product_pool.write(cr, uid, nullify_ids_list, {'quantity': 0, })
+        
+    
+    
     report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,('records imported'))
 #    report = u'* %s : %d %s:' % (time.strftime('%d.%m.%y %H:%M:%S'),new_prod_count+exist_prod_count,_('records imported'))
     report += u'\n\t- %d %s' % (new_prod_count,('records created'))
     #report += u'\n\t- %d %s' % (new_prod_count,_('records created'))
     report += u'\n\t- %d %s' % (exist_prod_count,('records updated'))
     #report += u'\n\t- %d %s' % (exist_prod_count,_('records updated'))
+    report += u'\n\t- %d %s' % (len(nullify_ids_list),('records nullified'))
     if error_rows_list:
         report += u'\n\t- %s: %s' % (('could not import records on rows'),str(error_rows_list)[1:-1])
         #report += u'\n\t- %s: %s' % (_('could not import records on rows'),str(error_rows_list)[1:-1])
