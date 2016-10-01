@@ -1199,6 +1199,9 @@ class virt_tire(models.Model):
     @api.multi 
     @api.model
     def parse_wsp(self):
+        if not (self.tire_wpd and self.name_minus_wpd):
+            _logger.error('Wpd %s or name_minus_wpd %s fields is not found: only with it i can go further!' % (unicode(self.tire_wpd),unicode(self.name_minus_wpd)))
+            return False
         parser = wspParser(self.name_minus_wpd)
         _logger.info('self.name_minus_wpd is: '+unicode(self.name_minus_wpd))
 #        parser = wspParser(self.name)

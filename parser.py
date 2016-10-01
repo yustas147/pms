@@ -310,9 +310,6 @@ class wpdParser(Parser):
 #     
         
 class wspParser(Parser):
-#class wspParser(wpdParser):
-#    def __init__(self, parse_string=False):
-#        super(wspParser,self).__init__(parse_string=parse_string)
 
     def parse(self):
         def chk(val):
@@ -322,26 +319,23 @@ class wspParser(Parser):
                 return ''
 
         def _repl(matched):
-#        def wsp_repl(matched):
             return chk(matched.group(2))+chk(matched.group(3))+chk(matched.group(4))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(5))
 
         def finder(cell):
-            rx_compiled = re.compile(ur'(.*?)\s+(\d{2,3}/)*?(\d{2,3})\s*([JKLMNPQRSTHVWYZ]R?)\s*(.*)', re.U)
-#            rx_compiled = re.compile(ur'(.*?)\s+(\d{2,3}/)*(\d{2,3})\s*([JKLMNPQRSTHVWYZ]R?)\s*(.*)', re.U)
-            res1 = re.sub(rx_compiled, _repl, cell)
-            res = res1.split('__')
-            if len(res) > 1:
-                res[1] = ' '+unicode(res[1])+' '
-                return res
-            else:
-                if len(res) == 1:
-                    return (['', res[0]])
-                else:
-                    return(['', ''])
-            #return re.sub(rx_compiled, wsp_repl, cell).split('__')
+            
+            re_list = ['(.*?)\s*(\d{2,3}\/)*?(\d{2,3})\s*(ZR|VR|[JKLMNPQRSTHVWYZ])(\s|$)(.*)']
+            
+            for regxp in re_list:
+#                rx_compiled = re.compile(regxp, re.U)    
+                rx_compiled = re.compile(regxp)    
+                res1 = re.sub(rx_compiled, _repl, cell)
+                res = res1.split('__')
+                if len(res) > 1:
+                    return res
+            return(['',''])
+            
         _logger.info('parse_string is: '+unicode(self.parse_string))
         self.res, self.res_string = finder(self.parse_string)
-#        self.res, self.res_string = wsp(self.parse_string)
         return self.res, self.parse_string
 
 class RParser(wpdParser):
