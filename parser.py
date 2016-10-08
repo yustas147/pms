@@ -5,6 +5,17 @@ import re, logging
 
 _logger = logging.getLogger('PMS')
 
+
+def finder(cell, _repl, re_list):
+            for regxp in re_list:
+#                rx_compiled = re.compile(regxp, re.U)    
+                rx_compiled = re.compile(regxp)    
+                res1 = re.sub(rx_compiled, _repl, cell)
+                res = res1.split('__')
+                if len(res) > 1:
+                    return res
+            return(['',''])
+
 #changes symb_a by symb_b in string
 def ch_symb(strng, symb_a, symb_b):
     if symb_a in strng:
@@ -347,24 +358,28 @@ class RParser(wpdParser):
             else:
                 return ''
 
-        def R_repl(matched):
-            return chk(matched.group(2))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(3))
+#         def R_repl(matched):
+#             return chk(matched.group(2))+'__'+' '+chk(matched.group(1))+' ' + chk(matched.group(3))
+        def _repl(matched):
+            return chk(matched.group(2))+'__'+' '+chk(matched.group(1))
+        
+        regex_list = [ur'(.*)\dx(.*)',ur'(.*)\s?([rR]\d\d[.,]?\d?)\s*(.*)']
 
-        def R(cell):
-            rx_compiled = re.compile(ur'(.*)\s?([rR]\d\d[.,]?\d?)\s*(.*)', re.U)
-#            rx_compiled = re.compile(ur'(.*)\s+(\d{2,3}/)*(\d{2,3})\s*([A-Z])\s*(.*)', re.U)
-            res1 = re.sub(rx_compiled, R_repl, cell)
-            res = res1.split('__')
-            if len(res) > 1:
-                res[1] = ' '+unicode(res[1])+' '
-                return res
-            else:
-                if len(res) == 1:
-                    return (['', res[0]])
-                else:
-                    return(['', ''])
+#         def R(cell):
+#             rx_compiled = re.compile(ur'(.*)\s?([rR]\d\d[.,]?\d?)\s*(.*)', re.U)
+#             res1 = re.sub(rx_compiled, R_repl, cell)
+#             res = res1.split('__')
+#             if len(res) > 1:
+#                 res[1] = ' '+unicode(res[1])+' '
+#                 return res
+#             else:
+#                 if len(res) == 1:
+#                     return (['', res[0]])
+#                 else:
+#                     return(['', ''])
             #return re.sub(rx_compiled, wsp_repl, cell).split('__')
-        self.res, self.res_string = R(self.parse_string)
+        self.res, self.res_string = finder(self.parse_string, _repl, regex_list)
+#        self.res, self.res_string = R(self.parse_string)
         return self.res, self.parse_string
             
 class wxrParser(Parser):

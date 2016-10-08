@@ -173,7 +173,19 @@ class product_template(models.Model):
             inst = self.browse(cr, uid, [instid])[0]
             inst.set_tyre_cat()
             _logger.info( unicode(inst.name)+"  categ processed by set_tyre_cat!")
-
+    
+    @api.one
+    @api.model
+    def set_disk_cat(self):
+        virt_pool = http.request.env['virt.disk']
+        vt =  virt_pool.search([('proxy_id','=',self.proxy_id.id)])[0]
+        vt.set_cat2()
+    
+    def set_disk_cat_all_sel_ids(self,cr,uid,ids,context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.set_disk_cat()
+            _logger.info( unicode(inst.name)+"  categ processed by set_tyre_cat!")
 
 
 
@@ -342,7 +354,6 @@ class virt_disk(models.Model):
     _inherits = {'product.proxy':'proxy_id'}
     
     brand = fields.Char('Brand') 
-#    tire_brand = fields.Many2one('mbrand') 
     model = fields.Char('Model') 
     wrsize = fields.Char('WRSize', help='width of wheel in inches x radius oboda (6,5j x 15)')
     pcd = fields.Char('PCD', help='quantity and diameter of mounting bores (4х98)') 
@@ -352,14 +363,14 @@ class virt_disk(models.Model):
     country = fields.Char('Country')
     type = fields.Selection([("l","Legkovy"),("lv", "Legkovantazhny"),("4x4","4x4"),("v","Vantazhny")],string='Type')
     etalonic_select = fields.Many2one('virt.disk',  string = 'Select etalonic tire') 
-#    etalonic_select = fields.Many2one('virt.disk', domain="[('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
-##    etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',True)]", string = 'Select etalonic tire') 
     reverse_etalonic_select = fields.Many2one('virt.disk', domain="[('wrsize', '=', wrsize),('dia', '=', dia),('et', '=', et),('pcd', '=', pcd), ('brand','=',brand),('model','=',model),('if_etalon','=',False)]", string = 'Select non-etalonic tire')
+
     etalonic_list = fields.One2many(compute='_get_etalonic_ids2', comodel_name='virt.disk', string = 'Possible etalon virt disks')
     reverse_etalonic_list = fields.One2many(compute='_get_reverse_etalonic_ids2', comodel_name='virt.disk', string = 'Possible non-etalon virt disks')
-    #etalonic_list_domain = fields.Text(string="Etalonic list domain", 
-    #                                   help="Set this field for etalonic select criteria in a style as odoo domain: [('wrsize', '=', wrsize),('dia', '=', dia)....]",
-    #                                   default="['brand','model','pcd','wrsize','et','dia','paint']")
+
+    lg_weightness = fields.Selection([(u'Легковые',u'Легковые'),(u'Легкогрузовые',u'Легкогрузовые'),('4x4','4x4')],string='Weightness')
+    R = fields.Char('R') 
+
     chkF_brand = fields.Boolean("Brand")
     chkF_model = fields.Boolean("Model")
     chkF_wrsize = fields.Boolean("WxD")
@@ -368,6 +379,109 @@ class virt_disk(models.Model):
     chkF_et = fields.Boolean("ET")
     chkF_paint = fields.Boolean("Paint")
                                                                             
+     
+     
+     
+    @api.one
+    def set_cat2(self):
+        self.parse_lg_weightness()
+        self.parse_R()
+        self.setCatIdBy_lg_weightness_and_R()
+    
+    def set_disk_cat_all_sel_ids(self, cr, uid, ids, context=False):
+        for instid in ids:
+            inst = self.browse(cr, uid, [instid])[0]
+            inst.set_cat2()
+            _logger.info( unicode(inst.name)+"  categ processed!")                                                                       
+                                                                            
+    @api.multi 
+    @api.model
+    def parse_R(self):
+        if not self.wrsize:
+            return False
+        parser = RParser(self.wrsize)
+#        parser = RParser(self.name)
+        parsed_wpd = parser.parse()[0]
+#        parsed_wpd, name_minus_wpd = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_wpd :
+            self.R = 'R'+parsed_wpd.upper()
+#            self.name_unparsed = name_minus_wpd
+        else:
+            _logger.warning("########## R not found in name: "+ unicode(self.name))
+        return True
+    
+    @api.multi 
+    @api.model
+    def parse_lg_weightness(self):
+        parser = lg_weightnessParser(parse_string=self.name, dict_type='disk_lg_weightness')
+        parsed_brand, name_minus_brand = parser.parse()
+#        parsed_brand, name_minus_brand = parser.parse(self.name)
+        if parsed_brand :
+            self.lg_weightness = parsed_brand
+            self.name_unparsed = name_minus_brand
+        else:
+            _logger.warning( "########## lg_weightness not found in name: "+ unicode(self.name))
+            #self.tire_studness = 'n/s'
+        return True
+                                                                            
+    @api.one
+    def getCatIdBy3(self, parent_parent_categ_name=False, parent_categ_name=False, categ_name=False):
+        if not (parent_categ_name and categ_name):
+            _logger.warn('Error:  possibly lg_WR or R fields not set ')
+            return False
+        cat_env = http.request.env['product.category']
+        try:
+            res = cat_env.search([('parent_id.parent_id.name','=',parent_parent_categ_name),('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+        except:
+            _logger.error('Error:  category '+unicode(parent_parent_categ_name)+'/'+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
+            res = False
+
+        _logger.info('result categ id: '+ unicode(res))
+        return res
+    
+    @api.multi
+    @api.model
+    def get_connected_product_template(self):
+        pt_env = self.env['product.template']
+        prox_id = self.proxy_id.id
+        _logger.info(" prox_id is: " + unicode(prox_id))
+        _logger.info(" pt_env is: " + unicode(pt_env))
+        res = pt_env.search([('proxy_id.id','=',prox_id)]).mapped('id')
+        if len(res):
+            res = pt_env.browse(res[0])
+            _logger.info(" res is: " + unicode(res))
+            return res
+        else:
+            return False
+    
+    @api.one
+    def setCatIdBy_lg_weightness_and_R(self):
+        cpt = self.get_connected_product_template() 
+        if cpt:
+            _logger.info('cpt name: '+ unicode(cpt.name))
+            res = self.getCatIdBy3(parent_parent_categ_name=u'Каталог дисков', parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+            _logger.info('res : %s' % (unicode(res)))
+            if res:
+                cpt.pms_categ_id = res 
+                _logger.info('cpt.pms_categ_id_name : '+ unicode(cpt.pms_categ_id.name))
+                return cpt.pms_categ_id
+            else:
+                _logger.info('category not set : not found')
+                return False
+    
+    @api.multi
+    @api.model
+    def open_real(self):
+        mod_name='product.template'
+        return {
+        'type': 'ir.actions.act_window',
+        'view_type': 'form',
+        'view_mode': 'form',
+        'res_model': mod_name,
+        'res_id': self.get_connected_product_template().mapped('id')[0],
+        "views": [[False, "form"]],
+        }
     
     
     @api.multi
@@ -412,19 +526,6 @@ class virt_disk(models.Model):
         _logger.info('n_inst is:  '+unicode(n_inst))
         n_inst.write({'etalon_id':self.proxy_id.id})
     
-#     @api.one
-#     def _get_etalonic_ids(self):
-#         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', True)])
-#         _logger.info('_get_etalonic_ids: '+unicode(et_rset))
-#         self.etalonic_list = et_rset
-#     
-#     @api.one
-#     def _get_reverse_etalonic_ids(self):
-#         et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('paint','=',self.paint),('if_etalon', '=', False)])
-#         _logger.info('_get_reverse_etalonic_ids: '+unicode(et_rset))
-#         self.reverse_etalonic_list = et_rset
 
     @api.one
     def get_chkF(self):
@@ -479,7 +580,6 @@ class virt_disk(models.Model):
         et_rset=False
         for fld in domlist:
             print "fld : "+unicode(fld)
- #           spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
             print 'self.fld: '+unicode(eval('self.'+fld))
             spar = '('+ "'"+fld+"'" +","+ "'='" +","+ 'self.'+fld + ')'
             _logger.info("spar is:"+unicode(spar))
@@ -493,117 +593,18 @@ class virt_disk(models.Model):
         self.reverse_etalonic_list = et_rset
         
         
-#    @api.onchange('etalonic_list')
     @api.onchange('chkF_brand','chkF_model','chkF_wrsize','chkF_dia','chkF_et','chkF_pcd','chkF_paint','etalonic_list')
     def onchange_mult_etalonic_select(self):
 
-#         def check_cur_state(self,f_list):
-#             res = True
-#             v_list = [eval('self.'+x) for x in f_list]
-#             return res
-        
-        #flist = ['etalonic_select']
-        
-        #check_cur_state(self,flist)
         res = {}
         res['domain'] = { 'etalonic_select':[] }
         res['domain']['etalonic_select'].append(('id','in', self.etalonic_list.mapped('id')))
-#        res['domain'] = { x:[] for x in flist }
-#        res['value'] = {}
         print "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU: "+unicode(res)
         return res
 
     
         
-#     @api.one
-#     def _get_etalonic_ids(self):
-#         possible_field_list = ['brand','model','pcd','wrsize','et','dia','paint']
-#         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-#  
-#             try:
-#                 domlist = eval(self.etalonic_list_domain) 
-# 
-#             except:
-#                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
-#                 domlist = []
-#             try:
-#                 for fld in domlist:
-#                     if fld not in possible_field_list:
-#                         domlist = []
-#                         break
-#             except:
-#                 _logger.error("Something wrong with domlist: "+unicode(self.etalonic_list_domain))
-#                 
-#                     
-#                  
-#             dyndom_lst = ["('if_etalon', '=', True)"] 
-#             et_rset=False
-#             len_domlist = len(domlist)
-#             if len_domlist == 0:
-#                 return False
-#             else:
-#                 for fld in domlist:
-#                     spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
-#                     _logger.info("spar is:"+unicode(spar))
-#                     dyndom_lst.append(spar)
-#                 dyndom_str = ",".join(dyndom_lst)
-#                 try:
-#                     et_rset = self.search([i for i in eval(dyndom_str)])
-#                 except:
-#                     _logger.error("search error: "+unicode(dyndom_str))
-#                  
-#         else:
-#             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', True)])
-#         self.etalonic_list = et_rset
-#         
-#         
-#     @api.one
-#     def _get_reverse_etalonic_ids(self):
-#         possible_field_list = ['brand','model','pcd','wrsize','et','dia','paint']
-#         if self.etalonic_list_domain and self.etalonic_list_domain.strip()[0] == '[' and self.etalonic_list_domain.strip()[-1] == ']':
-#  
-# #     _logger.info('self is:  '+unicode(self))
-# #     _logger.info('self wrsize is:  '+unicode(self.wrsize))
-# #     _logger.info(unicode(self.etalonic_list_domain))
-#             try:
-#                 domlist = eval(self.etalonic_list_domain) 
-#             except:
-#                 _logger.error("wrong self.etalonic_list_domain: "+unicode(self.etalonic_list_domain))
-#                 domlist = []
-# 
-#             try:
-#                 for fld in domlist:
-#                     if fld not in possible_field_list:
-#                         domlist = []
-#                         break
-#             except:
-#                 _logger.error("Something wrong with domlist: "+unicode(self.etalonic_list_domain))
-#                  
-# #     _logger.info("domlist: "+unicode(domlist))
-#             dyndom_lst = ["('if_etalon', '=', False)"] 
-#             et_rset=False
-#             len_domlist = len(domlist)
-#             if len_domlist == 0:
-#                 return False
-#             else:
-#                 for fld in domlist:
-#                     spar = '('+ "'"+fld+"'" +","+ "'='" +","+ "'"+eval('self.'+fld)+"'" + ')'
-#                     _logger.info("spar is:"+unicode(spar))
-#                     dyndom_lst.append(spar)
-#                 #_logger.info("dyndom_lst: "+unicode(dyndom_lst))
-#                 dyndom_str = ",".join(dyndom_lst)
-#                 #_logger.info("dyndom_str: "+unicode(dyndom_str))
-#                 try:
-#                     et_rset = self.search([i for i in eval(dyndom_str)])
-#                 except:
-#                     _logger.error("search error: "+unicode(dyndom_str))
-#                  
-#         else:
-#             et_rset = self.search([('wrsize', '=', self.wrsize), ('pcd', '=', self.pcd), ('brand', '=', self.brand), 
-#                                ('model','=',self.model),('et','=',self.et),('dia','=',self.dia),('if_etalon', '=', False)])
-#         self.reverse_etalonic_list = et_rset
-#     
+
     @api.one
     def autoconnect(self):
         if (self.wrsize and self.pcd and self.brand and self.model and self.dia and self.et and self.paint):
@@ -632,7 +633,7 @@ class virt_disk(models.Model):
     
     @api.one
     def clear_parsed_fields(self):
-        self.write({'brand':False,'model':False,'wrsize':False,'pcd':False,'et':False,'dia':False,'paint':False,'country':False})
+        self.write({'brand':False,'model':False,'wrsize':False,'pcd':False,'et':False,'dia':False,'paint':False,'country':False,'R':False,'lg_weightness':False})
 
     @api.one
     def disconnect_etalon(self):
@@ -649,6 +650,7 @@ class virt_disk(models.Model):
         self.parse_dia()
         self.parse_pcd()
         self.parse_paint()
+        self.parse_R()
     
     @api.multi 
     @api.model
@@ -771,6 +773,23 @@ class virt_tire(models.Model):
     chkF_tire_wsp = fields.Boolean("WSP")
     chkF_tire_wpd = fields.Boolean("WPD")
     chkF_tire_studness = fields.Boolean("Studness")
+    
+    
+    @api.multi
+    @api.model
+    def open_real(self):
+    #Define model name of agreement:
+        mod_name='product.template'
+        #print mod_name
+        return {
+        'type': 'ir.actions.act_window',
+        'view_type': 'form',
+        'view_mode': 'form',
+        'res_model': mod_name,
+        'res_id': self.get_connected_product_template().mapped('id')[0],
+        "views": [[False, "form"]],
+        }
+    
     
     
     @api.multi
@@ -933,15 +952,10 @@ class virt_tire(models.Model):
         cat_env = http.request.env['product.category']
         try:
             res = cat_env.search([('parent_id.parent_id.name','=',parent_parent_categ_name),('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
-#            res = cat_env.search([('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
         except:
-            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
-            #raise osv.except_osv(('Error'), ('Error:  category '+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found'))
             _logger.error('Error:  category '+unicode(parent_parent_categ_name)+'/'+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
             res = False
 
-        #if res:
-        #    res = cat_env.browse([res])
         _logger.info('result categ id: '+ unicode(res))
         return res
     
@@ -1065,20 +1079,7 @@ class virt_tire(models.Model):
                     res[k_n].append(v.name)
                 res[k_n].sort(key=len, reverse=True)
         return res
-# 
-#     @api.multi 
-#     @api.model
-#     def parse_brand(self, dt='tyre_brand'):
-#         parser_dict = self.get_parser_dict(dt)
-#         parser = brandParser(parser_dict, self.name)
-#         parsed_brand, name_minus_brand = parser.parse()
-# #        parsed_brand, name_minus_brand = parser.parse(self.name)
-#         if parsed_brand :
-#             self.tire_brand = parsed_brand
-#             self.name_unparsed = name_minus_brand
-#         else:
-#             print "########## brand not found in name: "+ unicode(self.name)
-#         return True
+
 
     @api.multi 
     @api.model

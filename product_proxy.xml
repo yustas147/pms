@@ -154,6 +154,7 @@
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>
 	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
+	                   <button name="open_real" string="Open prod. template" type="object" />	
 				    </header>
                		<sheet>
 	                	<table>
@@ -202,10 +203,6 @@
                                                     <tr><td><label for="tire_wpd"/></td>     <td><field name="tire_wpd"/></td>     <td style="width:10%;"></td> <td><field name="chkF_tire_wpd" nolabel="1"/></td><td style="width:10%;"></td></tr>
                                                     <tr><td><label for="tire_studness"/></td>     <td><field name="tire_studness"/></td>     <td style="width:10%;"></td> <td><field name="chkF_tire_studness" nolabel="1"/></td><td style="width:10%;"></td></tr>
                                                     <tr><td><label for="lg_weightness"/></td><td><field name="lg_weightness"/></td><td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
-                                                    
-                                                    
-                                                    
-                                                    
                                                     <tr><td><label for="R"/></td>            <td><field name="R"/></td>            <td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
                                                     <tr><td><label for="season"/></td>       <td><field name="season"/></td>       <td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
                                            </table>
@@ -287,6 +284,13 @@
 	                   <button name="clear_parsed_fields" string="clear parsed fields" type="object" />	
 	                   <button name="disconnect_etalon" string="disconnect from etalon" type="object" attrs="{'invisible':[('etalon_id', '=', False)]}"/>	
 	                   <button name="open_brand_dict" string="Open brand dictionary" type="object" />	
+	                   
+	                   <button name="parse_R" string="parse R" type="object" />
+	                   <button name="parse_lg_weightness" string="parse weightness" type="object" />
+	                   <button name="get_connected_product_template" string="get_connected_product_template" type="object" />	
+		       		   <button name='setCatIdBy_lg_weightness_and_R' type='object' string='set cat by W and R' />
+	                   <button name="open_real" string="Open prod. template" type="object" />	
+		       		   
 				    </header>
                		<sheet>
 	                		    <table>
@@ -336,6 +340,8 @@
                                                     <tr><td><label for="dia"/></td><td><field name="dia"        /></td> <td style="width:10%;"></td> <td><field name="chkF_dia" nolabel="1"/></td><td style="width:10%;"></td></tr>
                                                     <tr><td><label for="et"/></td><td><field name="et"          /></td> <td style="width:10%;"></td> <td><field name="chkF_et" nolabel="1"/></td><td style="width:10%;"></td></tr>
                                                     <tr><td><label for="paint"/></td><td><field name="paint"    /></td> <td style="width:10%;"></td> <td><field name="chkF_paint" nolabel="1"/></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="lg_weightness"/></td><td><field name="lg_weightness"/></td><td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
+                                                    <tr><td><label for="R"/></td>            <td><field name="R"/></td>            <td style="width:10%;"></td> <td></td><td style="width:10%;"></td></tr>
                                            </table>
 							              </td>
 						            	</tr>
@@ -458,11 +464,23 @@
                <field name="state">code</field>
                <field name="code">action = self.set_tyre_cat_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
+        <record id="set_disk_cat_sel_server_act" model="ir.actions.server">
+               <field name="name">Set DISK categories for selected ids</field>
+                <field name="model_id" ref="model_product_template"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.set_disk_cat_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
         <record id="set_cat2_sel_server_act" model="ir.actions.server">
                <field name="name">Set categories for selected ids</field>
                 <field name="model_id" ref="model_virt_tire"/> 
                <field name="state">code</field>
                <field name="code">action = self.set_cat2_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
+        </record>
+        <record id="set_disk_cat2_sel_server_act" model="ir.actions.server">
+               <field name="name">Set categories for selected ids</field>
+                <field name="model_id" ref="model_virt_disk"/> 
+               <field name="state">code</field>
+               <field name="code">action = self.set_disk_cat_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
           
            <record id="parse_name_all_server_act" model="ir.actions.server">
