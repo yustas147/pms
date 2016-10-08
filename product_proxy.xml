@@ -470,7 +470,7 @@
                <field name="state">code</field>
                <field name="code">action = self.set_disk_cat_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
         </record>
-        <record id="set_cat2_sel_server_act" model="ir.actions.server">
+   <!--      <record id="set_cat2_sel_server_act" model="ir.actions.server">
                <field name="name">Set categories for selected ids</field>
                 <field name="model_id" ref="model_virt_tire"/> 
                <field name="state">code</field>
@@ -481,7 +481,7 @@
                 <field name="model_id" ref="model_virt_disk"/> 
                <field name="state">code</field>
                <field name="code">action = self.set_disk_cat_all_sel_ids(cr, uid, context.get('active_ids',[]),context=context)</field>
-        </record>
+        </record> -->
           
            <record id="parse_name_all_server_act" model="ir.actions.server">
                <field name="name">Parse selected tires</field>
