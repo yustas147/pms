@@ -905,11 +905,14 @@ class virt_tire(models.Model):
             _logger.info( unicode(inst.name)+"  categ processed!")
 
     @api.one
-    def setCatIdBy_lg_weightness_and_R(self):
+    def setCatIdBy_lg_weightness_and_R(self, context={'lang':'en_US'}):
+        ##self._context['lang'] = 'en_US' 
         cpt = self.get_connected_product_template() 
+        _logger.info('self.env.context setCatIdBy_lg_weightness_and_R  is: %s' % (unicode(self.env.context)))
         if cpt:
             _logger.info('cpt name: '+ unicode(cpt.name))
-            res = self.getCatIdBy3(parent_parent_categ_name=u'Каталог шин', parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+            #res = self.getCatIdBy3(parent_parent_categ_name=u'Каталог шин', parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
+            res = self.with_context(lang='en_US').getCatIdBy3(parent_parent_categ_name=u'Каталог шин', parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
 #            res = self.getCatIdBy2(parent_categ_name=self.lg_weightness, categ_name=self.R)[0]
             _logger.info('res : '+ unicode(res))
             if res:
@@ -946,12 +949,14 @@ class virt_tire(models.Model):
     
     @api.one
     def getCatIdBy3(self, parent_parent_categ_name=False, parent_categ_name=False, categ_name=False):
+        _logger.info('self.env.context in getCatIdBy3 is: %s' % (unicode(self.env.context)))
         if not (parent_categ_name and categ_name):
             _logger.warn('Error:  possibly lg_WR or R fields not set ')
             return False
         cat_env = http.request.env['product.category']
+        #context = {'lang':'en_US'}
         try:
-            res = cat_env.search([('parent_id.parent_id.name','=',parent_parent_categ_name),('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
+            res = cat_env.with_context(lang='en_US').search([('parent_id.parent_id.name','=',parent_parent_categ_name),('parent_id.name','=',parent_categ_name),('name','=',categ_name)]).mapped('id')[0]
         except:
             _logger.error('Error:  category '+unicode(parent_parent_categ_name)+'/'+unicode(parent_categ_name)+' / '+unicode(categ_name)+ ' not found')
             res = False
