@@ -775,6 +775,11 @@ class virt_tire(models.Model):
     chkF_tire_studness = fields.Boolean("Studness")
     
     
+    @api.one
+    def manual_connect(self):
+        if self.etalonic_select:
+            self.etalon_id = self.etalonic_select.proxy_id.id
+
     @api.multi
     @api.model
     def open_real(self):
